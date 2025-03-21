@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 public class DatabaseUtil {
+    private DatabaseUtil() {
+    }
 
     public static List<String> getColumnNames(EntityManager entityManager, Class<?> entityClass) {
         List<String> columnNames = new ArrayList<>();
@@ -46,6 +48,7 @@ public class DatabaseUtil {
 
         return entitiesWithTriggerTable;
     }
+
     private static String[] splitByCamelCase(String input) {
         return input.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
     }
@@ -53,7 +56,7 @@ public class DatabaseUtil {
     private static String capitalizeFirst(String[] words) {
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
-            if(s.equals("Id")) {
+            if (s.equals("Id")) {
                 continue;
             }
             String word = s.toLowerCase();
