@@ -10,6 +10,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerBudgetDto {
+    private Integer customerBudgetId;
     private String customerName;
     private Double amount;
     private Date startDate;

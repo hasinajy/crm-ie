@@ -19,7 +19,7 @@ public class CustomerBudgetService {
         return customerBudgetRepository.findAllBudgetDtos();
     }
 
-    public List<CustomerBudgetDto> getBudgetsByCustomerId(Long customerId) {
+    public List<CustomerBudgetDto> getBudgetsByCustomerId(Integer customerId) {
         return customerBudgetRepository.findBudgetDtosByCustomerId(customerId);
     }
 
@@ -39,5 +39,9 @@ public class CustomerBudgetService {
         budget.setEndDate(endDate);
 
         return customerBudgetRepository.save(budget);
+    }
+
+    public void deleteBudget(Integer budgetId) {
+        customerBudgetRepository.deleteById(budgetId.longValue());
     }
 }

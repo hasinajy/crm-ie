@@ -66,4 +66,11 @@ public class CustomerBudgetController {
             return "customer-budget/form";
         }
     }
+
+    @PostMapping("/delete")
+    public String deleteBudget(
+            @RequestParam("budgetId") Integer budgetId) {
+        budgetService.deleteBudget(budgetId);
+        return "redirect:/budgets";
+    }
 }
