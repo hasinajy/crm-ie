@@ -73,6 +73,15 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">Lead Expenses</h4>
+
+                                <div th:if="${message != null}" class="alert alert-success" role="alert">
+                                    <span th:text="${message}"></span>
+                                </div>
+
+                                <div th:if="${error != null}" class="alert alert-danger" role="alert">
+                                    <span th:text="${error}"></span>
+                                </div>
+
                                 <div class="table-responsive m-t-40">
                                     <table id="config-table" class="table display table-bordered table-striped no-wrap">
                                         <thead>
@@ -93,9 +102,18 @@
                                                 <td th:text="${expense.amount}"></td>
                                                 <td th:text="${expense.date}"></td>
                                                 <td>
-                                                    <a
-                                                        th:href="@{/expenses/leads/edit(leadExpenseId=${expense.leadExpenseId})}">
-                                                        <i class="fas fa-edit"></i> </a>
+                                                    <a th:href="@{/expenses/leads/edit(leadExpenseId=${expense.leadExpenseId})}"
+                                                        class="btn btn-primary">
+                                                        <i class="mdi mdi-pencil"></i>
+                                                    </a>
+                                                    <form class="d-inline" th:action="@{/expenses/leads/delete}"
+                                                        method="post">
+                                                        <input type="hidden" name="leadExpenseId"
+                                                            th:value="${expense.leadExpenseId}" />
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="mdi mdi-delete"></i>
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         </tbody>
