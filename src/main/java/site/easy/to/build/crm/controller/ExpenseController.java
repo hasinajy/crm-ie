@@ -247,4 +247,18 @@ public class ExpenseController {
         }
         return "redirect:/expenses/leads";
     }
+
+    @PostMapping("/tickets/delete")
+    public String deleteTicketExpense(
+            @RequestParam("ticketExpenseId") Integer ticketExpenseId,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            ticketExpenseService.deleteTicketExpense(ticketExpenseId);
+            redirectAttributes.addFlashAttribute("message", "Ticket expense deleted successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete ticket expense");
+        }
+        return "redirect:/expenses/tickets";
+    }
 }
