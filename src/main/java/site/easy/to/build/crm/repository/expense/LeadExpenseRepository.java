@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface LeadExpenseRepository extends JpaRepository<LeadExpense, Integer> {
-    List<LeadExpense> findAll();
+    public List<LeadExpense> findAll();
 
     @Query("SELECT le FROM LeadExpense le JOIN le.lead l JOIN l.customer c WHERE c.customerId = :customerId")
-    List<LeadExpense> findAllLeadExpensesByCustomerId(@Param("customerId") Integer customerId);
+    public List<LeadExpense> findAllLeadExpensesByCustomerId(@Param("customerId") Integer customerId);
 }

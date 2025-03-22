@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
+    public List<Ticket> findAll();
+
     public Ticket findByTicketId(int ticketId);
 
     public List<Ticket> findByManagerId(int id);

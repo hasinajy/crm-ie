@@ -18,4 +18,8 @@ public class TicketExpenseService {
     public List<TicketExpense> getAllTicketExpensesByCustomerId(Integer customerId) {
         return ticketExpenseRepository.findAllTicketExpensesByCustomerId(customerId);
     }
+
+    public TicketExpense createTicketExpense(TicketExpense ticketExpense) {
+        return ticketExpenseRepository.save(ticketExpense);
+    }
 }

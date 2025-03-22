@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface TicketExpenseRepository extends JpaRepository<TicketExpense, Integer> {
-    List<TicketExpense> findAll();
+    public List<TicketExpense> findAll();
 
     @Query("SELECT te FROM TicketExpense te JOIN te.ticket t JOIN t.customer c WHERE c.customerId = :customerId")
-    List<TicketExpense> findAllTicketExpensesByCustomerId(@Param("customerId") Integer customerId);
+    public List<TicketExpense> findAllTicketExpensesByCustomerId(@Param("customerId") Integer customerId);
 }
