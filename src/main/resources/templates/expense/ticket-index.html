@@ -82,6 +82,7 @@
                                                 <th>Description</th>
                                                 <th>Amount</th>
                                                 <th>Date</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -91,6 +92,12 @@
                                                 <td th:text="${expense.description}"></td>
                                                 <td th:text="${expense.amount}"></td>
                                                 <td th:text="${expense.date}"></td>
+                                                <td>
+                                                    <a
+                                                        th:href="@{/expenses/tickets/edit(ticketExpenseId=${expense.ticketExpenseId})}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

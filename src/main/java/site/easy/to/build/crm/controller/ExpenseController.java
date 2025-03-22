@@ -185,4 +185,53 @@ public class ExpenseController {
             return "expense/lead-form";
         }
     }
+
+    @GetMapping("/tickets/edit")
+    public String showEditTicketExpenseForm(@RequestParam("ticketExpenseId") Integer ticketExpenseId, Model model) {
+        TicketExpense ticketExpense = ticketExpenseService.getTicketExpenseById(ticketExpenseId);
+        List<Ticket> tickets = ticketService.getAllTickets();
+
+        if (ticketExpense == null) {
+            return "redirect:/expenses/tickets";
+        }
+
+        model.addAttribute("ticketExpense", ticketExpense);
+        model.addAttribute("tickets", tickets);
+        return "expense/ticket-form";
+    }
+
+    @PostMapping("/tickets/update")
+    public String updateTicketExpense(
+            @RequestParam("ticketExpenseId") Integer ticketExpenseId,
+            @RequestParam("ticketId") Integer ticketId,
+            @RequestParam("description") String description,
+            @RequestParam("amount") double amount,
+            @RequestParam("date") String dateString,
+            Model model) {
+        try {
+            LocalDate date = LocalDate.parse(dateString);
+
+            TicketExpense ticketExpense = new TicketExpense();
+            Ticket ticket = new Ticket();
+            ticket.setTicketId(ticketId);
+
+            ticketExpense.setTicketExpenseId(ticketExpenseId);
+            ticketExpense.setTicket(ticket);
+            ticketExpense.setDescription(description);
+            ticketExpense.setAmount(amount);
+            ticketExpense.setDate(date);
+
+            TicketExpense updatedTicketExpense = ticketExpenseService.updateTicketExpense(ticketExpense);
+
+            if (updatedTicketExpense == null) {
+                model.addAttribute("error", "Ticket expense not found");
+                return "expense/ticket-form";
+            }
+
+            return "redirect:/expenses/tickets";
+        } catch (Exception e) {
+            model.addAttribute("error", "Invalid data format");
+            return "expense/ticket-form";
+        }
+    }
 }

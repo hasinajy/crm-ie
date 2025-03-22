@@ -69,41 +69,56 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Create Ticket Expense</h4>
+                                <h4 class="card-title"
+                                    th:text="${ticketExpense?.ticketExpenseId != null} ? 'Edit Ticket Expense' : 'Create Ticket Expense'">
+                                    Create Ticket Expense
+                                </h4>
 
                                 <div th:if="${error != null}" class="alert alert-danger" role="alert">
                                     <span th:text="${error}"></span>
                                 </div>
 
-                                <form th:action="@{/expenses/tickets}" method="post">
+                                <form
+                                    th:action="${ticketExpense?.ticketExpenseId != null} ? @{/expenses/tickets/update} : @{/expenses/tickets}"
+                                    method="post">
+                                    <input type="hidden" name="ticketExpenseId"
+                                        th:if="${ticketExpense?.ticketExpenseId != null}"
+                                        th:value="${ticketExpense?.ticketExpenseId}" />
 
                                     <label class="m-t-20" for="ticketId">Ticket:</label>
                                     <div class="input-group">
                                         <select name="ticketId" id="ticketId" class="form-control" required>
                                             <option value="">-- Select Ticket --</option>
                                             <option th:each="ticket : ${tickets}" th:value="${ticket.ticketId}"
-                                                th:text="${ticket.subject}"></option>
+                                                th:text="${ticket.subject}"
+                                                th:selected="${ticketExpense?.ticket?.ticketId == ticket.ticketId}">
+                                            </option>
                                         </select>
                                     </div>
 
                                     <label class="m-t-20" for="description">Description:</label>
                                     <div class="input-group">
                                         <input type="text" id="description" name="description" class="form-control"
-                                            placeholder="Enter description" required />
+                                            placeholder="Enter description" required
+                                            th:value="${ticketExpense?.description}" />
                                     </div>
 
                                     <label class="m-t-20" for="amount">Amount:</label>
                                     <div class="input-group">
                                         <input type="number" step="0.01" id="amount" name="amount" class="form-control"
-                                            placeholder="Enter amount" required />
+                                            placeholder="Enter amount" required th:value="${ticketExpense?.amount}" />
                                     </div>
 
                                     <label class="m-t-20" for="date">Date:</label>
                                     <div class="input-group">
-                                        <input type="date" id="date" name="date" class="form-control" required />
+                                        <input type="date" id="date" name="date" class="form-control" required
+                                            th:value="${ticketExpense?.date}" />
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary m-t-20">Create Ticket Expense</button>
+                                    <button type="submit" class="btn btn-primary m-t-20"
+                                        th:text="${ticketExpense?.ticketExpenseId != null} ? 'Update Ticket Expense' : 'Create Ticket Expense'">
+                                        Create Ticket Expense
+                                    </button>
                                 </form>
                             </div>
                         </div>
