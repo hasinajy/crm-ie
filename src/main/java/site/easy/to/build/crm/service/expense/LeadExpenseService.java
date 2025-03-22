@@ -20,4 +20,8 @@ public class LeadExpenseService {
     public List<LeadExpense> getAllLeadExpensesByCustomerId(Integer customerId) {
         return leadExpenseRepository.findAllLeadExpensesByCustomerId(customerId);
     }
+
+    public LeadExpense createLeadExpense(LeadExpense leadExpense) {
+        return leadExpenseRepository.save(leadExpense);
+    }
 }

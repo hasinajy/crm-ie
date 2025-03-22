@@ -14,5 +14,4 @@ public interface LeadExpenseRepository extends JpaRepository<LeadExpense, Intege
 
     @Query("SELECT le FROM LeadExpense le JOIN le.lead l JOIN l.customer c WHERE c.customerId = :customerId")
     List<LeadExpense> findAllLeadExpensesByCustomerId(@Param("customerId") Integer customerId);
-
 }
