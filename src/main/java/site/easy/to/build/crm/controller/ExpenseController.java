@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import site.easy.to.build.crm.entity.LeadExpense;
+import site.easy.to.build.crm.entity.TicketExpense;
 import site.easy.to.build.crm.service.expense.LeadExpenseService;
+import site.easy.to.build.crm.service.expense.TicketExpenseService;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExpenseController {
     private final LeadExpenseService leadExpenseService;
+    private final TicketExpenseService ticketExpenseService;
 
     @GetMapping("/leads")
     public String displayLeadExpenses(@RequestParam(value = "customerId", required = false) Integer customerId,
@@ -31,5 +34,20 @@ public class ExpenseController {
 
         model.addAttribute("leadExpenses", leadExpenses);
         return "expense/lead-index";
+    }
+
+    @GetMapping("/tickets")
+    public String displayTicketExpenses(@RequestParam(value = "customerId", required = false) Integer customerId,
+            Model model) {
+        List<TicketExpense> ticketExpenses;
+
+        if (customerId != null) {
+            ticketExpenses = ticketExpenseService.getAllTicketExpensesByCustomerId(customerId);
+        } else {
+            ticketExpenses = ticketExpenseService.getAllTicketExpenses();
+        }
+
+        model.addAttribute("ticketExpenses", ticketExpenses);
+        return "expense/ticket-index";
     }
 }
