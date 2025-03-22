@@ -533,3 +533,17 @@ CREATE TABLE IF NOT EXISTS `lead_expense` (
   CONSTRAINT `lead_expense_ibfk_1` FOREIGN KEY (`lead_id`) REFERENCES `trigger_lead` (`lead_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `ticket_expense` (
+  `ticket_expense_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `trigger_ticket_id` INT UNSIGNED DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `amount` DOUBLE DEFAULT NULL,
+  `date` DATE DEFAULT NULL,
+  PRIMARY KEY (`ticket_expense_id`),
+  KEY `fk_ticket_expense_ticket` (`trigger_ticket_id`),
+  CONSTRAINT `fk_ticket_expense_ticket` FOREIGN KEY (`trigger_ticket_id`) REFERENCES `trigger_ticket` (`ticket_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
