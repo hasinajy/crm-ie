@@ -67,6 +67,58 @@ public class CustomerBudgetController {
         }
     }
 
+    @GetMapping("/edit")
+    public String displayEditBudgetForm(
+            @RequestParam("budgetId") Integer budgetId,
+            Model model) {
+        CustomerBudget budget = budgetService.findById(budgetId);
+        if (budget == null) {
+            return "redirect:/budgets";
+        }
+
+        List<Customer> customers = customerRepository.findAll();
+        model.addAttribute("budget", budget);
+        model.addAttribute("customers", customers);
+        model.addAttribute("error", null);
+        return "customer-budget/form";
+    }
+
+    @PostMapping("/update")
+    public String updateBudget(
+            @RequestParam("budgetId") Integer budgetId,
+            @RequestParam("customerId") Integer customerId,
+            @RequestParam("amount") Double amount,
+            @RequestParam("startDate") Date startDate,
+            @RequestParam("endDate") Date endDate,
+            Model model) {
+        try {
+            Customer customer = customerRepository.findByCustomerId(customerId);
+            if (customer == null) {
+                throw new IllegalArgumentException("Customer not found");
+            }
+
+            CustomerBudget budget = budgetService.findById(budgetId);
+            if (budget == null) {
+                throw new IllegalArgumentException("Budget not found");
+            }
+
+            budget.setCustomer(customer);
+            budget.setAmount(amount);
+            budget.setStartDate(startDate);
+            budget.setEndDate(endDate);
+            budgetService.updateBudget(budget);
+
+            return "redirect:/budgets";
+        } catch (Exception e) {
+            Customer customer = new Customer();
+            customer.setCustomerId(customerId);
+            model.addAttribute("error", "An error occurred while updating the budget");
+            model.addAttribute("budget", new CustomerBudget(budgetId, customer, amount, startDate, endDate));
+            model.addAttribute("customers", customerRepository.findAll());
+            return "customer-budget/form";
+        }
+    }
+
     @PostMapping("/delete")
     public String deleteBudget(
             @RequestParam("budgetId") Integer budgetId) {

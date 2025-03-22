@@ -12,6 +12,8 @@ import java.util.List;
 
 @Repository
 public interface CustomerBudgetRepository extends JpaRepository<CustomerBudget, Long> {
+    @Query("SELECT cb FROM CustomerBudget cb WHERE cb.customerBudgetId = :customerBudgetId")
+    CustomerBudget findByCustomerBudgetId(@Param("customerBudgetId") Integer customerBudgetId);
 
     @Query("SELECT new site.easy.to.build.crm.dto.CustomerBudgetDto(" +
             "cb.customerBudgetId, " +
