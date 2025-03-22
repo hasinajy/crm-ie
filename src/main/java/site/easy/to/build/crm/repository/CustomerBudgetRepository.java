@@ -12,8 +12,11 @@ import java.util.List;
 
 @Repository
 public interface CustomerBudgetRepository extends JpaRepository<CustomerBudget, Long> {
+    @Query("SELECT cb FROM CustomerBudget cb WHERE cb.customerBudgetId = :customerBudgetId")
+    CustomerBudget findByCustomerBudgetId(@Param("customerBudgetId") Integer customerBudgetId);
 
     @Query("SELECT new site.easy.to.build.crm.dto.CustomerBudgetDto(" +
+            "cb.customerBudgetId, " +
             "c.name, " +
             "cb.amount, " +
             "cb.startDate, " +
@@ -22,13 +25,14 @@ public interface CustomerBudgetRepository extends JpaRepository<CustomerBudget, 
     List<CustomerBudgetDto> findAllBudgetDtos();
 
     @Query("SELECT new site.easy.to.build.crm.dto.CustomerBudgetDto(" +
+            "cb.customerBudgetId, " +
             "c.name, " +
             "cb.amount, " +
             "cb.startDate, " +
             "cb.endDate) " +
             "FROM CustomerBudget cb JOIN cb.customer c " +
             "WHERE c.id = :customerId")
-    List<CustomerBudgetDto> findBudgetDtosByCustomerId(@Param("customerId") Long customerId);
+    List<CustomerBudgetDto> findBudgetDtosByCustomerId(@Param("customerId") Integer customerId);
 
     @Query("SELECT cb FROM CustomerBudget cb " +
             "WHERE cb.customer.customerId = :customerId " +

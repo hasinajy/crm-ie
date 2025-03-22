@@ -81,6 +81,7 @@
                                                 <th>Amount</th>
                                                 <th>Start Period</th>
                                                 <th>End Period</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -89,6 +90,19 @@
                                                 <td th:text="${budget.amount}"></td>
                                                 <td th:text="${budget.startDate}"></td>
                                                 <td th:text="${budget.endDate}"></td>
+                                                <td>
+                                                    <a th:href="@{/budgets/edit(budgetId=${budget.customerBudgetId})}"
+                                                        class="btn btn-primary">
+                                                        <i class="mdi mdi-pencil"></i>
+                                                    </a>
+                                                    <form class="d-inline"
+                                                        th:action="@{/budgets/delete(budgetId=${budget.customerBudgetId})}"
+                                                        method="post">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="mdi mdi-delete"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

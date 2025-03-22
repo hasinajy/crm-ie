@@ -25,7 +25,7 @@ public class CustomerBudget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_budget_id")
-    private Long customerBudgetId;
+    private Integer customerBudgetId;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
