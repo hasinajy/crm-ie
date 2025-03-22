@@ -140,4 +140,49 @@ public class ExpenseController {
             return "expense/ticket-form";
         }
     }
+
+    @GetMapping("/leads/edit")
+    public String showEditLeadExpenseForm(@RequestParam("leadExpenseId") Integer leadExpenseId, Model model) {
+        LeadExpense leadExpense = leadExpenseService.getLeadExpenseById(leadExpenseId);
+        List<Lead> leads = leadService.getAllLeads();
+
+        model.addAttribute("leadExpense", leadExpense);
+        model.addAttribute("leads", leads);
+        return "expense/lead-form";
+    }
+
+    @PostMapping("/leads/update")
+    public String updateLeadExpense(
+            @RequestParam("leadExpenseId") Integer leadExpenseId,
+            @RequestParam("leadId") Integer leadId,
+            @RequestParam("description") String description,
+            @RequestParam("amount") double amount,
+            @RequestParam("date") String dateString,
+            Model model) {
+        try {
+            LocalDate date = LocalDate.parse(dateString);
+
+            LeadExpense leadExpense = new LeadExpense();
+            Lead lead = new Lead();
+            lead.setLeadId(leadId);
+
+            leadExpense.setLeadExpenseId(leadExpenseId);
+            leadExpense.setLead(lead);
+            leadExpense.setDescription(description);
+            leadExpense.setAmount(amount);
+            leadExpense.setDate(date);
+
+            LeadExpense updatedLeadExpense = leadExpenseService.updateLeadExpense(leadExpense);
+
+            if (updatedLeadExpense == null) {
+                model.addAttribute("error", "Lead expense not found");
+                return "expense/lead-form";
+            }
+
+            return "redirect:/expenses/leads";
+        } catch (Exception e) {
+            model.addAttribute("error", "Invalid data format");
+            return "expense/lead-form";
+        }
+    }
 }
