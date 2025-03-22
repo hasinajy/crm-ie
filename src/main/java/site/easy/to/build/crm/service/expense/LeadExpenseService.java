@@ -13,21 +13,10 @@ import java.util.List;
 public class LeadExpenseService {
     private final LeadExpenseRepository leadExpenseRepository;
 
-    /**
-     * Retrieves all lead expenses.
-     *
-     * @return A list of all LeadExpense objects.
-     */
     public List<LeadExpense> getAllLeadExpenses() {
         return leadExpenseRepository.findAll();
     }
 
-    /**
-     * Retrieves all lead expenses associated with a specific customer ID.
-     *
-     * @param customerId The ID of the customer.
-     * @return A list of LeadExpense objects related to the specified customer.
-     */
     public List<LeadExpense> getAllLeadExpensesByCustomerId(Integer customerId) {
         return leadExpenseRepository.findAllLeadExpensesByCustomerId(customerId);
     }
