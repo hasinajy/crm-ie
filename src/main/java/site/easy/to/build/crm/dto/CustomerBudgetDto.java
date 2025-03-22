@@ -12,6 +12,6 @@ import java.sql.Date;
 public class CustomerBudgetDto {
     private String customerName;
     private Double amount;
-    private Date starDate;
+    private Date startDate;
     private Date endDate;
 }
