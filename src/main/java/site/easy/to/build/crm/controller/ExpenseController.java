@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import site.easy.to.build.crm.dto.TotalExpenseDto;
@@ -233,5 +234,17 @@ public class ExpenseController {
             model.addAttribute("error", "Invalid data format");
             return "expense/ticket-form";
         }
+    }
+
+    @PostMapping("/leads/delete")
+    public String deleteLeadExpense(@RequestParam("leadExpenseId") Integer leadExpenseId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            leadExpenseService.deleteLeadExpense(leadExpenseId);
+            redirectAttributes.addFlashAttribute("message", "Lead expense deleted successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete lead expense");
+        }
+        return "redirect:/expenses/leads";
     }
 }
