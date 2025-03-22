@@ -69,41 +69,56 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Create Lead Expense</h4>
+                                <h4 class="card-title"
+                                    th:text="${leadExpense?.leadExpenseId != null} ? 'Edit Lead Expense' : 'Create Lead Expense'">
+                                    Create Lead Expense
+                                </h4>
 
                                 <div th:if="${error != null}" class="alert alert-danger" role="alert">
                                     <span th:text="${error}"></span>
                                 </div>
 
-                                <form th:action="@{/expenses/leads}" method="post">
+                                <form
+                                    th:action="${leadExpense?.leadExpenseId != null} ? @{/expenses/leads/update} : @{/expenses/leads}"
+                                    method="post">
+                                    <input type="hidden" name="leadExpenseId"
+                                        th:if="${leadExpense?.leadExpenseId != null}"
+                                        th:value="${leadExpense?.leadExpenseId}" />
 
                                     <label class="m-t-20" for="leadId">Lead:</label>
                                     <div class="input-group">
                                         <select name="leadId" id="leadId" class="form-control" required>
                                             <option value="">-- Select Lead --</option>
                                             <option th:each="lead : ${leads}" th:value="${lead.leadId}"
-                                                th:text="${lead.name}"></option>
+                                                th:text="${lead.name}"
+                                                th:selected="${leadExpense?.lead?.leadId == lead.leadId}">
+                                            </option>
                                         </select>
                                     </div>
 
                                     <label class="m-t-20" for="description">Description:</label>
                                     <div class="input-group">
                                         <input type="text" id="description" name="description" class="form-control"
-                                            placeholder="Enter description" required />
+                                            placeholder="Enter description" required
+                                            th:value="${leadExpense?.description}" />
                                     </div>
 
                                     <label class="m-t-20" for="amount">Amount:</label>
                                     <div class="input-group">
                                         <input type="number" step="0.01" id="amount" name="amount" class="form-control"
-                                            placeholder="Enter amount" required />
+                                            placeholder="Enter amount" required th:value="${leadExpense?.amount}" />
                                     </div>
 
                                     <label class="m-t-20" for="date">Date:</label>
                                     <div class="input-group">
-                                        <input type="date" id="date" name="date" class="form-control" required />
+                                        <input type="date" id="date" name="date" class="form-control" required
+                                            th:value="${leadExpense?.date}" />
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary m-t-20">Create Lead Expense</button>
+                                    <button type="submit" class="btn btn-primary m-t-20"
+                                        th:text="${leadExpense?.leadExpenseId != null} ? 'Update Lead Expense' : 'Create Lead Expense'">
+                                        Create Lead Expense
+                                    </button>
                                 </form>
                             </div>
                         </div>
