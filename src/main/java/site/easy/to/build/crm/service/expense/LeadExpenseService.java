@@ -40,4 +40,8 @@ public class LeadExpenseService {
                     "Lead expense with id " + leadExpense.getLeadExpenseId() + " does not exist");
         }
     }
+
+    public void deleteLeadExpense(Integer leadExpenseId) {
+        leadExpenseRepository.deleteById(leadExpenseId);
+    }
 }
