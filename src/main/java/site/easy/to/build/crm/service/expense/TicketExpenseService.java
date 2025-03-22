@@ -39,4 +39,8 @@ public class TicketExpenseService {
                     "Ticket expense with id " + ticketExpense.getTicketExpenseId() + " does not exist");
         }
     }
+
+    public void deleteTicketExpense(Integer ticketExpenseId) {
+        ticketExpenseRepository.deleteById(ticketExpenseId);
+    }
 }
