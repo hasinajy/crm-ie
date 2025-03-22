@@ -519,3 +519,17 @@ CREATE TABLE IF NOT EXISTS `customer_budget` (
   CONSTRAINT `customer_budget_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `lead_expense` (
+  `lead_expense_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `lead_id` INT UNSIGNED DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `amount` DOUBLE DEFAULT NULL,
+  `date` DATE DEFAULT NULL,
+  PRIMARY KEY (`lead_expense_id`),
+  KEY `lead_id` (`lead_id`),
+  CONSTRAINT `lead_expense_ibfk_1` FOREIGN KEY (`lead_id`) REFERENCES `trigger_lead` (`lead_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
