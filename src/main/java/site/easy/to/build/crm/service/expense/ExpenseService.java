@@ -95,4 +95,26 @@ public class ExpenseService {
                 })
                 .toList();
     }
+
+    /**
+     * Checks if adding a new expense amount to the customer's total expenses would
+     * exceed their budget.
+     *
+     * @param customerId       The ID of the customer.
+     * @param newExpenseAmount The amount of the new expense.
+     * @return true if the new expense would exceed the budget, false otherwise.
+     */
+    public boolean checkIfBudgetIsExceeded(Integer customerId, double newExpenseAmount) {
+        Customer customer = customerService.findByCustomerId(customerId);
+        if (customer == null) {
+            return false;
+        }
+
+        double customerBudget = customerBudgetService.getBudgetByCustomerId(customerId);
+        double totalLeadExpenses = leadExpenseService.getLeadExpenseByCustomerId(customerId);
+        double totalTicketExpenses = ticketExpenseService.getTicketExpenseByCustomerId(customerId);
+
+        double totalExpenses = totalLeadExpenses + totalTicketExpenses;
+        return (totalExpenses + newExpenseAmount) > customerBudget;
+    }
 }

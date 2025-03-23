@@ -83,12 +83,19 @@
                                     Warning: Customer's expense threshold has been reached.
                                 </div>
 
+                                <div th:if="${confirmation != null}" class="alert alert-warning" role="alert">
+                                    <span th:text="${confirmation}"></span>
+                                </div>
+
                                 <form
-                                    th:action="${ticketExpense?.ticketExpenseId != null} ? @{/expenses/tickets/update} : @{/expenses/tickets}"
+                                    th:action="${confirmation == null && ticketExpense?.ticketExpenseId != null} ? @{/expenses/tickets/update} : @{/expenses/tickets}"
                                     method="post">
                                     <input type="hidden" name="ticketExpenseId"
                                         th:if="${ticketExpense?.ticketExpenseId != null}"
                                         th:value="${ticketExpense?.ticketExpenseId}" />
+
+                                    <input type="hidden" name="confirm" th:if="${confirmation != null}"
+                                        th:value="Confirm" />
 
                                     <div th:if="${ticketToUpdate == null}">
                                         <label class="m-t-20" for="ticketId">Ticket:</label>
@@ -133,9 +140,12 @@
                                     </div>
 
                                     <button type="submit" class="btn btn-primary m-t-20"
-                                        th:text="${ticketExpense?.ticketExpenseId != null} ? 'Update Ticket Expense' : 'Create Ticket Expense'">
+                                        th:text="${confirmation != null} ? 'Confirm' : (${ticketExpense?.ticketExpenseId != null} ? 'Update Ticket Expense' : 'Create Ticket Expense')">
                                         Create Ticket Expense
                                     </button>
+
+                                    <a th:if="${confirmation != null}" th:href="@{/expenses/tickets}"
+                                        class="btn btn-secondary m-t-20">Cancel</a>
                                 </form>
                             </div>
                         </div>
