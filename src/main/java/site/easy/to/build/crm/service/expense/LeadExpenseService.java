@@ -26,6 +26,21 @@ public class LeadExpenseService {
         return leadExpenseRepository.findAllLeadExpensesByCustomerId(customerId);
     }
 
+    /**
+     * Retrieves the sum of all lead expense amounts for a customer by their ID.
+     *
+     * @param customerId The ID of the customer.
+     * @return The sum of all lead expense amounts, or 0.0 if no lead expenses are
+     *         found.
+     */
+    public double getLeadExpenseByCustomerId(Integer customerId) {
+        List<LeadExpense> leadExpenses = leadExpenseRepository.findAllLeadExpensesByCustomerId(customerId);
+        if (leadExpenses != null && !leadExpenses.isEmpty()) {
+            return leadExpenses.stream().mapToDouble(LeadExpense::getAmount).sum();
+        }
+        return 0.0;
+    }
+
     public LeadExpense createLeadExpense(LeadExpense leadExpense) {
         return leadExpenseRepository.save(leadExpense);
     }
