@@ -2,6 +2,8 @@ package site.easy.to.build.crm.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import site.easy.to.build.crm.entity.Customer;
 import site.easy.to.build.crm.entity.Ticket;
@@ -12,7 +14,8 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     public List<Ticket> findAll();
 
-    public Ticket findByTicketId(int ticketId);
+    @Query("SELECT t FROM Ticket t WHERE t.ticketId = :ticketId")
+    Ticket findByTicketId(@Param("ticketId") int ticketId);
 
     public List<Ticket> findByManagerId(int id);
 

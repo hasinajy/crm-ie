@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en-US" xmlns:th="http://www.thymeleaf.org">
 
 <div th:insert="~{/general/head.html}"></div>
 
@@ -78,6 +78,11 @@
                                     <span th:text="${error}"></span>
                                 </div>
 
+                                <div th:if="${expenseThresholdReached != null}" class="alert alert-warning"
+                                    role="alert">
+                                    Warning: Customer's expense threshold has been reached.
+                                </div>
+
                                 <form
                                     th:action="${ticketExpense?.ticketExpenseId != null} ? @{/expenses/tickets/update} : @{/expenses/tickets}"
                                     method="post">
@@ -85,15 +90,27 @@
                                         th:if="${ticketExpense?.ticketExpenseId != null}"
                                         th:value="${ticketExpense?.ticketExpenseId}" />
 
-                                    <label class="m-t-20" for="ticketId">Ticket:</label>
-                                    <div class="input-group">
-                                        <select name="ticketId" id="ticketId" class="form-control" required>
-                                            <option value="">-- Select Ticket --</option>
-                                            <option th:each="ticket : ${tickets}" th:value="${ticket.ticketId}"
-                                                th:text="${ticket.subject}"
-                                                th:selected="${ticketExpense?.ticket?.ticketId == ticket.ticketId}">
-                                            </option>
-                                        </select>
+                                    <div th:if="${ticketToUpdate == null}">
+                                        <label class="m-t-20" for="ticketId">Ticket:</label>
+                                        <div class="input-group">
+                                            <select name="ticketId" id="ticketId" class="form-control" required>
+                                                <option value="">-- Select Ticket --</option>
+                                                <option th:each="ticket : ${tickets}" th:value="${ticket.ticketId}"
+                                                    th:text="${ticket.subject}"
+                                                    th:selected="${ticketExpense?.ticket?.ticketId == ticket.ticketId}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div th:if="${ticketToUpdate != null}">
+                                        <label class="m-t-20">Ticket:</label>
+                                        <div class="input-group">
+                                            <input type="hidden" name="ticketId"
+                                                th:value="${ticketToUpdate.ticketId}" />
+                                            <input type="text" class="form-control" th:value="${ticketToUpdate.subject}"
+                                                readonly />
+                                        </div>
                                     </div>
 
                                     <label class="m-t-20" for="description">Description:</label>

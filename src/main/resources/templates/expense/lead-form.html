@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en-US" xmlns:th="http://www.thymeleaf.org">
 
 <div th:insert="~{/general/head.html}"></div>
 
@@ -78,6 +78,11 @@
                                     <span th:text="${error}"></span>
                                 </div>
 
+                                <div th:if="${expenseThresholdReached != null}" class="alert alert-warning"
+                                    role="alert">
+                                    Warning: Customer's expense threshold has been reached.
+                                </div>
+
                                 <form
                                     th:action="${leadExpense?.leadExpenseId != null} ? @{/expenses/leads/update} : @{/expenses/leads}"
                                     method="post">
@@ -85,15 +90,25 @@
                                         th:if="${leadExpense?.leadExpenseId != null}"
                                         th:value="${leadExpense?.leadExpenseId}" />
 
-                                    <label class="m-t-20" for="leadId">Lead:</label>
-                                    <div class="input-group">
-                                        <select name="leadId" id="leadId" class="form-control" required>
-                                            <option value="">-- Select Lead --</option>
-                                            <option th:each="lead : ${leads}" th:value="${lead.leadId}"
-                                                th:text="${lead.name}"
-                                                th:selected="${leadExpense?.lead?.leadId == lead.leadId}">
-                                            </option>
-                                        </select>
+                                    <div th:if="${leadToUpdate == null}">
+                                        <label class="m-t-20" for="leadId">Lead:</label>
+                                        <div class="input-group">
+                                            <select name="leadId" id="leadId" class="form-control" required>
+                                                <option value="">-- Select Lead --</option>
+                                                <option th:each="lead : ${leads}" th:value="${lead.leadId}"
+                                                    th:text="${lead.name}"
+                                                    th:selected="${leadExpense?.lead?.leadId == lead.leadId}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div th:if="${leadToUpdate != null}">
+                                        <label class="m-t-20">Lead:</label>
+                                        <div class="input-group">
+                                            <input type="hidden" name="leadId" th:value="${leadToUpdate.leadId}" />
+                                            <input type="text" class="form-control" th:value="${leadToUpdate.name}"
+                                                readonly />
+                                        </div>
                                     </div>
 
                                     <label class="m-t-20" for="description">Description:</label>

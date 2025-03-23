@@ -547,3 +547,27 @@ CREATE TABLE IF NOT EXISTS `ticket_expense` (
   CONSTRAINT `fk_ticket_expense_ticket` FOREIGN KEY (`trigger_ticket_id`) REFERENCES `trigger_ticket` (`ticket_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `expense_threshold` (
+  `threshold_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `value` DOUBLE DEFAULT NULL,
+  PRIMARY KEY (`threshold_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expense_threshold`
+--
+
+LOCK TABLES `expense_threshold` WRITE;
+
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+
+INSERT IGNORE INTO `expense_threshold` (value)
+VALUES (0.8);
+
+/*!40000 ALTER TABLE `expense_threshold` ENABLE KEYS */;
+
+UNLOCK TABLES;

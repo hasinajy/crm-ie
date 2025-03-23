@@ -71,8 +71,22 @@ public class ExpenseController {
     }
 
     @GetMapping("/leads/create")
-    public String showLeadExpenseForm(Model model) {
+    public String showLeadExpenseForm(
+            @RequestParam(name = "leadId", required = false) Integer leadId,
+            Model model) {
         List<Lead> leads = leadService.getAllLeads();
+
+        if (leadId != null) {
+            Lead leadToUpdate = leadService.findByLeadId(leadId);
+            Integer customerId = leadToUpdate.getCustomer().getCustomerId();
+            boolean expenseThresholdReached = expenseService.checkIfExpenseThresholdIsReached(customerId);
+            model.addAttribute("leadToUpdate", leadToUpdate);
+
+            if (expenseThresholdReached) {
+                model.addAttribute("expenseThresholdReached", true);
+            }
+        }
+
         model.addAttribute("leads", leads);
         return "expense/lead-form";
     }
@@ -106,9 +120,23 @@ public class ExpenseController {
         }
     }
 
-    @GetMapping("tickets/create")
-    public String showTicketExpenseForm(Model model) {
+    @GetMapping("/tickets/create")
+    public String showTicketExpenseForm(
+            @RequestParam(name = "ticketId", required = false) Integer ticketId,
+            Model model) {
         List<Ticket> tickets = ticketService.getAllTickets();
+
+        if (ticketId != null) {
+            Ticket ticketToUpdate = ticketService.findByTicketId(ticketId);
+            Integer customerId = ticketToUpdate.getCustomer().getCustomerId();
+            boolean expenseThresholdReached = expenseService.checkIfExpenseThresholdIsReached(customerId);
+            model.addAttribute("ticketToUpdate", ticketToUpdate);
+
+            if (expenseThresholdReached) {
+                model.addAttribute("expenseThresholdReached", true);
+            }
+        }
+
         model.addAttribute("tickets", tickets);
         return "expense/ticket-form";
     }

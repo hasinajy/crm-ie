@@ -24,6 +24,21 @@ public class TicketExpenseService {
         return ticketExpenseRepository.findAllTicketExpensesByCustomerId(customerId);
     }
 
+    /**
+     * Retrieves the sum of all ticket expense amounts for a customer by their ID.
+     *
+     * @param customerId The ID of the customer.
+     * @return The sum of all ticket expense amounts, or 0.0 if no ticket expenses
+     *         are found.
+     */
+    public double getTicketExpenseByCustomerId(Integer customerId) {
+        List<TicketExpense> ticketExpenses = ticketExpenseRepository.findAllTicketExpensesByCustomerId(customerId);
+        if (ticketExpenses != null && !ticketExpenses.isEmpty()) {
+            return ticketExpenses.stream().mapToDouble(TicketExpense::getAmount).sum();
+        }
+        return 0.0;
+    }
+
     public TicketExpense createTicketExpense(TicketExpense ticketExpense) {
         return ticketExpenseRepository.save(ticketExpense);
     }
