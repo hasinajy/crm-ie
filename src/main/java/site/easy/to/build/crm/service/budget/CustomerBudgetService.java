@@ -57,4 +57,18 @@ public class CustomerBudgetService {
     public void deleteBudget(Integer budgetId) {
         customerBudgetRepository.deleteById(budgetId.longValue());
     }
+
+    /**
+     * Retrieves the sum of all budget amounts for a customer by their ID.
+     *
+     * @param customerId The ID of the customer.
+     * @return The sum of all budget amounts, or 0.0 if no budgets are found.
+     */
+    public double getBudgetByCustomerId(Integer customerId) {
+        List<CustomerBudgetDto> budgets = customerBudgetRepository.findBudgetDtosByCustomerId(customerId);
+        if (budgets != null && !budgets.isEmpty()) {
+            return budgets.stream().mapToDouble(CustomerBudgetDto::getAmount).sum();
+        }
+        return 0.0;
+    }
 }
