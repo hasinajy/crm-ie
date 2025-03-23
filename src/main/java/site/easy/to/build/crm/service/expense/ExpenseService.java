@@ -3,16 +3,66 @@ package site.easy.to.build.crm.service.expense;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import site.easy.to.build.crm.dto.TotalExpenseDto;
+import site.easy.to.build.crm.entity.Customer;
+import site.easy.to.build.crm.entity.ExpenseThreshold;
 import site.easy.to.build.crm.entity.LeadExpense;
 import site.easy.to.build.crm.entity.TicketExpense;
+import site.easy.to.build.crm.repository.ExpenseThresholdRepository;
+import site.easy.to.build.crm.service.budget.CustomerBudgetService;
+import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
+    private final CustomerServiceImpl customerService;
+    private final CustomerBudgetService customerBudgetService;
+    private final ExpenseThresholdRepository expenseThresholdRepository;
     private final LeadExpenseService leadExpenseService;
     private final TicketExpenseService ticketExpenseService;
+
+    /**
+     * Checks if the remaining budget for a customer, identified by customerId, is
+     * below the warning threshold.
+     *
+     * @param customerId The ID of the customer.
+     * @return true if the remaining budget is below the warning threshold, false
+     *         otherwise.
+     */
+    public boolean checkIfExpenseThresholdIsReached(Integer customerId) {
+        Customer customer = customerService.findByCustomerId(customerId);
+        if (customer == null) {
+            return false;
+        }
+
+        double customerBudget = customerBudgetService.getBudgetByCustomerId(customerId);
+        double totalLeadExpenses = leadExpenseService.getLeadExpenseByCustomerId(customerId);
+        double totalTicketExpenses = ticketExpenseService.getTicketExpenseByCustomerId(customerId);
+
+        ExpenseThreshold threshold = getExpenseThreshold();
+        if (threshold == null) {
+            return false;
+        }
+
+        double totalExpenses = totalLeadExpenses + totalTicketExpenses;
+        double expensesPercentage = totalExpenses / customerBudget;
+        return expensesPercentage > threshold.getValue();
+    }
+
+    /**
+     * Retrieves the first ExpenseThreshold entity from the database.
+     *
+     * @return The first ExpenseThreshold entity, or null if none exists.
+     */
+    public ExpenseThreshold getExpenseThreshold() {
+        List<ExpenseThreshold> thresholds = expenseThresholdRepository.findAll();
+        if (!thresholds.isEmpty()) {
+            return thresholds.get(0);
+        }
+        return null;
+    }
 
     /**
      * Aggregates lead and ticket expenses to calculate total expenses for each
