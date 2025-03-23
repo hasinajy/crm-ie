@@ -157,24 +157,35 @@ public class ExpenseController {
             @RequestParam("description") String description,
             @RequestParam("amount") double amount,
             @RequestParam("date") String dateString,
+            @RequestParam(name = "confirm", required = false) String confirm,
             Model model) {
 
         try {
             LocalDate date = LocalDate.parse(dateString);
 
             TicketExpense ticketExpense = new TicketExpense();
-            Ticket ticket = new Ticket();
-            ticket.setTicketId(ticketId);
+            Ticket ticket = ticketService.findByTicketId(ticketId);
 
             ticketExpense.setTicket(ticket);
             ticketExpense.setDescription(description);
             ticketExpense.setAmount(amount);
             ticketExpense.setDate(date);
 
+            Integer customerId = ticket.getCustomer().getCustomerId();
+            boolean budgetIsExceeded = expenseService.checkIfBudgetIsExceeded(customerId, amount);
+
+            if (budgetIsExceeded && confirm == null) {
+                model.addAttribute("ticketToUpdate", ticket);
+                model.addAttribute("ticketExpense", ticketExpense);
+                model.addAttribute("confirmation", "Adding this expense would exceed the customer's budget");
+                return "expense/ticket-form";
+            }
+
             ticketExpenseService.createTicketExpense(ticketExpense);
 
             return "redirect:/expenses/tickets";
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             model.addAttribute("error", "Invalid data format");
             return "expense/ticket-form";
         }
