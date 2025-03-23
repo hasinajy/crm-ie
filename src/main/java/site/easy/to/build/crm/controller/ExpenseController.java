@@ -97,19 +97,29 @@ public class ExpenseController {
             @RequestParam("description") String description,
             @RequestParam("amount") double amount,
             @RequestParam("date") String dateString,
+            @RequestParam(name = "confirm", required = false) String confirm,
             Model model) {
 
         try {
             LocalDate date = LocalDate.parse(dateString);
 
             LeadExpense leadExpense = new LeadExpense();
-            Lead lead = new Lead();
-            lead.setLeadId(leadId);
+            Lead lead = leadService.findByLeadId(leadId);
 
             leadExpense.setLead(lead);
             leadExpense.setDescription(description);
             leadExpense.setAmount(amount);
             leadExpense.setDate(date);
+
+            Integer customerId = lead.getCustomer().getCustomerId();
+            boolean budgetIsExceeded = expenseService.checkIfBudgetIsExceeded(customerId, amount);
+
+            if (budgetIsExceeded && confirm == null) {
+                model.addAttribute("leadToUpdate", lead);
+                model.addAttribute("leadExpense", leadExpense);
+                model.addAttribute("confirmation", "Adding this expense would exceed the customer's budget");
+                return "expense/lead-form";
+            }
 
             leadExpenseService.createLeadExpense(leadExpense);
 
