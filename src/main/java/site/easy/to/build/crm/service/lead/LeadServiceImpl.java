@@ -18,6 +18,10 @@ public class LeadServiceImpl implements LeadService {
         this.leadRepository = leadRepository;
     }
 
+    public List<Lead> getAllLeads() {
+        return leadRepository.findAll();
+    }
+
     @Override
     public Lead findByLeadId(int id) {
         return leadRepository.findByLeadId(id);
@@ -39,9 +43,10 @@ public class LeadServiceImpl implements LeadService {
     }
 
     @Override
-    public Lead findByMeetingId(String meetingId){
+    public Lead findByMeetingId(String meetingId) {
         return leadRepository.findByMeetingId(meetingId);
     }
+
     @Override
     public Lead save(Lead lead) {
         return leadRepository.save(lead);
@@ -60,7 +65,7 @@ public class LeadServiceImpl implements LeadService {
 
     @Override
     public List<Lead> getRecentCustomerLeads(int customerId, int limit) {
-        Pageable pageable = PageRequest.of(0,limit);
+        Pageable pageable = PageRequest.of(0, limit);
         return leadRepository.findByCustomerCustomerIdOrderByCreatedAtDesc(customerId, pageable);
     }
 
