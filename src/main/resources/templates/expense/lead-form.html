@@ -83,12 +83,19 @@
                                     Warning: Customer's expense threshold has been reached.
                                 </div>
 
+                                <div th:if="${confirmation != null}" class="alert alert-warning" role="alert">
+                                    <span th:text="${confirmation}"></span>
+                                </div>
+
                                 <form
-                                    th:action="${leadExpense?.leadExpenseId != null} ? @{/expenses/leads/update} : @{/expenses/leads}"
+                                    th:action="${confirmation == null && leadExpense?.leadExpenseId != null} ? @{/expenses/leads/update} : @{/expenses/leads}"
                                     method="post">
                                     <input type="hidden" name="leadExpenseId"
                                         th:if="${leadExpense?.leadExpenseId != null}"
                                         th:value="${leadExpense?.leadExpenseId}" />
+
+                                    <input type="hidden" name="confirm" th:if="${confirmation != null}"
+                                        th:value="Confirm" />
 
                                     <div th:if="${leadToUpdate == null}">
                                         <label class="m-t-20" for="leadId">Lead:</label>
@@ -131,9 +138,11 @@
                                     </div>
 
                                     <button type="submit" class="btn btn-primary m-t-20"
-                                        th:text="${leadExpense?.leadExpenseId != null} ? 'Update Lead Expense' : 'Create Lead Expense'">
+                                        th:text="${confirmation != null} ? 'Confirm' : (${leadExpense?.leadExpenseId != null} ? 'Update Lead Expense' : 'Create Lead Expense')">
                                         Create Lead Expense
                                     </button>
+                                    <a th:if="${confirmation != null}" th:href="@{/expenses/leads}"
+                                        class="btn btn-secondary m-t-20">Cancel</a>
                                 </form>
                             </div>
                         </div>
