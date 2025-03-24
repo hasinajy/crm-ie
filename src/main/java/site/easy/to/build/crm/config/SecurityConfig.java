@@ -21,13 +21,9 @@ import site.easy.to.build.crm.config.oauth2.OAuthLoginSuccessHandler;
 public class SecurityConfig {
 
     private final OAuthLoginSuccessHandler oAuth2LoginSuccessHandler;
-
     private final CustomOAuth2UserService oauthUserService;
-
     private final CrmUserDetails crmUserDetails;
-
     private final CustomerUserDetails customerUserDetails;
-
     private final Environment environment;
 
     @Autowired
@@ -47,33 +43,49 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    // New API Security Filter Chain (Order 1)
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/**") // Only apply to /api/** paths
+                .authorizeHttpRequests((authorize) -> authorize
+                        .anyRequest().permitAll() // Allow all requests under /api/**
+                )
+                .csrf((csrf) -> csrf
+                        .disable() // Disable CSRF for API endpoints entirely
+                );
+
+        return http.build();
+    }
+
+    // Main Security Filter Chain (Order 2)
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository = new HttpSessionCsrfTokenRepository();
         httpSessionCsrfTokenRepository.setParameterName("csrf");
 
-        http.csrf((csrf) -> csrf
-                .csrfTokenRepository(httpSessionCsrfTokenRepository)
-                .ignoringRequestMatchers("/api/**"));
-
-        http.authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/api/**").permitAll()
-                .requestMatchers("/register/**").permitAll()
-                .requestMatchers("/set-employee-password/**").permitAll()
-                .requestMatchers("/change-password/**").permitAll()
-                .requestMatchers("/font-awesome/**").permitAll()
-                .requestMatchers("/fonts/**").permitAll()
-                .requestMatchers("/images/**").permitAll()
-                .requestMatchers("/save").permitAll()
-                .requestMatchers("/js/**").permitAll()
-                .requestMatchers("/css/**").permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/**/manager/**")).hasRole("MANAGER")
-                .requestMatchers("/employee/**").hasAnyRole("MANAGER", "EMPLOYEE")
-                .requestMatchers("/customer/**").hasRole("CUSTOMER")
-                .anyRequest().authenticated())
-
+        http
+                .csrf((csrf) -> csrf
+                        .csrfTokenRepository(httpSessionCsrfTokenRepository)
+                // No need to ignore /api/** since it's handled by apiSecurityFilterChain
+                )
+                .authorizeHttpRequests((authorize) -> authorize
+                        // Removed /api/** from here as it's handled by apiSecurityFilterChain
+                        .requestMatchers("/register/**").permitAll()
+                        .requestMatchers("/set-employee-password/**").permitAll()
+                        .requestMatchers("/change-password/**").permitAll()
+                        .requestMatchers("/font-awesome/**").permitAll()
+                        .requestMatchers("/fonts/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/save").permitAll()
+                        .requestMatchers("/js/**").permitAll()
+                        .requestMatchers("/css/**").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/**/manager/**")).hasRole("MANAGER")
+                        .requestMatchers("/employee/**").hasAnyRole("MANAGER", "EMPLOYEE")
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
+                        .anyRequest().authenticated())
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -90,9 +102,8 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .permitAll())
-                .exceptionHandling(exception -> {
-                    exception.accessDeniedHandler(accessDeniedHandler());
-                });
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(accessDeniedHandler()));
 
         return http.build();
     }
@@ -102,26 +113,26 @@ public class SecurityConfig {
         return new CustomAccessDeniedHandler();
     }
 
+    // Customer Security Filter Chain (Order 3, adjusted from 1)
     @Bean
-    @Order(1)
+    @Order(3)
     public SecurityFilterChain customerSecurityFilterChain(HttpSecurity http) throws Exception {
-
         HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository = new HttpSessionCsrfTokenRepository();
         httpSessionCsrfTokenRepository.setParameterName("csrf");
 
-        http.csrf((csrf) -> csrf
-                .csrfTokenRepository(httpSessionCsrfTokenRepository));
-
-        http.securityMatcher("/customer-login/**").authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/set-password/**").permitAll()
-                .requestMatchers("/font-awesome/**").permitAll()
-                .requestMatchers("/fonts/**").permitAll()
-                .requestMatchers("/images/**").permitAll()
-                .requestMatchers("/js/**").permitAll()
-                .requestMatchers("/css/**").permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/**/manager/**")).hasRole("MANAGER")
-                .anyRequest().authenticated())
-
+        http
+                .securityMatcher("/customer-login/**")
+                .csrf((csrf) -> csrf
+                        .csrfTokenRepository(httpSessionCsrfTokenRepository))
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/set-password/**").permitAll()
+                        .requestMatchers("/font-awesome/**").permitAll()
+                        .requestMatchers("/fonts/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/js/**").permitAll()
+                        .requestMatchers("/css/**").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/**/manager/**")).hasRole("MANAGER")
+                        .anyRequest().authenticated())
                 .formLogin((form) -> form
                         .loginPage("/customer-login")
                         .loginProcessingUrl("/customer-login")
