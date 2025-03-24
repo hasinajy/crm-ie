@@ -29,5 +29,4 @@ public class LeadExpenseApiController {
         Gson gson = new Gson();
         return gson.toJson(leadExpenseDtos);
     }
-
 }
