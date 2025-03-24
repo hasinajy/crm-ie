@@ -7,17 +7,17 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
-public class TicketExpenseMapper {
-    private TicketExpenseMapper() {
-    }
+import org.springframework.stereotype.Component;
 
-    public static List<TicketExpenseDto> mapTicketExpensesToDtos(List<TicketExpense> ticketExpenses) {
+@Component
+public class TicketExpenseMapper {
+    public List<TicketExpenseDto> mapTicketExpensesToDtos(List<TicketExpense> ticketExpenses) {
         return ticketExpenses.stream()
-                .map(TicketExpenseMapper::mapTicketExpenseToDto)
+                .map(this::mapTicketExpenseToDto)
                 .toList();
     }
 
-    public static TicketExpenseDto mapTicketExpenseToDto(TicketExpense ticketExpense) {
+    public TicketExpenseDto mapTicketExpenseToDto(TicketExpense ticketExpense) {
         TicketExpenseDto dto = new TicketExpenseDto();
         dto.setTicketExpenseId(ticketExpense.getTicketExpenseId());
 
