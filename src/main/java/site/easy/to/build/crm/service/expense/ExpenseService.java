@@ -117,4 +117,24 @@ public class ExpenseService {
         double totalExpenses = totalLeadExpenses + totalTicketExpenses;
         return (totalExpenses + newExpenseAmount) > customerBudget;
     }
+
+    /**
+     * Updates the existing ExpenseThreshold value or creates a new one if it
+     * doesn't exist.
+     *
+     * @param newValue The new threshold value to set.
+     * @return The updated ExpenseThreshold entity.
+     */
+    public ExpenseThreshold updateExpenseThreshold(double newValue) {
+        List<ExpenseThreshold> thresholds = expenseThresholdRepository.findAll();
+        ExpenseThreshold threshold;
+        if (!thresholds.isEmpty()) {
+            threshold = thresholds.get(0);
+            threshold.setValue(newValue);
+        } else {
+            threshold = new ExpenseThreshold();
+            threshold.setValue(newValue);
+        }
+        return expenseThresholdRepository.save(threshold);
+    }
 }
