@@ -15,6 +15,14 @@ import java.util.List;
 public class CustomerBudgetService {
     private final CustomerBudgetRepository customerBudgetRepository;
 
+    public double getBudgetsTotal() {
+        List<CustomerBudgetDto> allBudgets = getAllBudgetDtos();
+        if (allBudgets != null && !allBudgets.isEmpty()) {
+            return allBudgets.stream().mapToDouble(CustomerBudgetDto::getAmount).sum();
+        }
+        return 0.0;
+    }
+
     public List<CustomerBudgetDto> getAllBudgetDtos() {
         return customerBudgetRepository.findAllBudgetDtos();
     }
