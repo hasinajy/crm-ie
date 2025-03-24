@@ -12,6 +12,14 @@ import java.util.Optional;
 public class TicketExpenseService {
     private final TicketExpenseRepository ticketExpenseRepository;
 
+    public double getTicketExpensesTotal() {
+        List<TicketExpense> ticketExpenses = getAllTicketExpenses();
+        if (ticketExpenses != null && !ticketExpenses.isEmpty()) {
+            return ticketExpenses.stream().mapToDouble(TicketExpense::getAmount).sum();
+        }
+        return 0.0;
+    }
+
     public TicketExpense getTicketExpenseById(Integer ticketExpenseId) {
         return ticketExpenseRepository.findById(ticketExpenseId).orElseThrow();
     }
