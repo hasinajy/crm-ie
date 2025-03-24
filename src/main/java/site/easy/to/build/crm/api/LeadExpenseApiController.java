@@ -16,6 +16,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,4 +65,16 @@ public class LeadExpenseApiController {
                     .body("Error updating lead expense");
         }
     }
+
+    @DeleteMapping("/v1/lead-expenses/{id}")
+    public ResponseEntity<String> deleteLeadExpense(@PathVariable("id") int id) {
+        try {
+            leadExpenseService.deleteLeadExpense(id);
+            return ResponseEntity.ok("Lead expense deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting lead expense");
+        }
+    }
+
 }
