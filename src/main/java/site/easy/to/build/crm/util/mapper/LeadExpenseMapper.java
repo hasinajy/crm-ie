@@ -7,17 +7,20 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
-public class LeadExpenseMapper {
-    private LeadExpenseMapper() {
-    }
+import org.springframework.stereotype.Component;
 
-    public static List<LeadExpenseDto> mapLeadExpensesToDtos(List<LeadExpense> leadExpenses) {
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class LeadExpenseMapper {
+    public List<LeadExpenseDto> mapLeadExpensesToDtos(List<LeadExpense> leadExpenses) {
         return leadExpenses.stream()
-                .map(LeadExpenseMapper::mapLeadExpenseToDto)
+                .map(this::mapLeadExpenseToDto)
                 .toList();
     }
 
-    public static LeadExpenseDto mapLeadExpenseToDto(LeadExpense leadExpense) {
+    public LeadExpenseDto mapLeadExpenseToDto(LeadExpense leadExpense) {
         LeadExpenseDto dto = new LeadExpenseDto();
         dto.setLeadExpenseId(leadExpense.getLeadExpenseId());
 
