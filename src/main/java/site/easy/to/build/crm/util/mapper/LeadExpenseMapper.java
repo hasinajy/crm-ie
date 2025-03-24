@@ -1,4 +1,4 @@
-package site.easy.to.build.crm.util;
+package site.easy.to.build.crm.util.mapper;
 
 import site.easy.to.build.crm.dto.LeadExpenseDto;
 import site.easy.to.build.crm.entity.LeadExpense;

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import site.easy.to.build.crm.dto.LeadExpenseDto;
 import site.easy.to.build.crm.entity.LeadExpense;
 import site.easy.to.build.crm.service.expense.LeadExpenseService;
-import site.easy.to.build.crm.util.LeadExpenseMapper;
+import site.easy.to.build.crm.util.mapper.LeadExpenseMapper;
 
 import java.util.List;
 
