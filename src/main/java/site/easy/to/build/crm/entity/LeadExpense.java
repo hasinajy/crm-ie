@@ -31,15 +31,4 @@ public class LeadExpense {
 
     @Column(name = "date")
     private LocalDate date;
-
-    @Override
-    public String toString() {
-        return "LeadExpense{" +
-                "leadExpenseId=" + leadExpenseId +
-                ", lead=" + lead +
-                ", description='" + description + '\'' +
-                ", amount=" + amount +
-                ", date=" + date +
-                '}';
-    }
 }
