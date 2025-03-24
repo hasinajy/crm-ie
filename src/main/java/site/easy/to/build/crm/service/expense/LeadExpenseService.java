@@ -14,6 +14,14 @@ import java.util.Optional;
 public class LeadExpenseService {
     private final LeadExpenseRepository leadExpenseRepository;
 
+    public double getLeadExpensesTotal() {
+        List<LeadExpense> leadExpenses = getAllLeadExpenses();
+        if (leadExpenses != null && !leadExpenses.isEmpty()) {
+            return leadExpenses.stream().mapToDouble(LeadExpense::getAmount).sum();
+        }
+        return 0.0;
+    }
+
     public LeadExpense getLeadExpenseById(Integer expenseId) {
         return leadExpenseRepository.findById(expenseId).orElseThrow();
     }
