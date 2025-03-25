@@ -211,13 +211,15 @@ public class ExpenseCsvImportService {
             return false;
         }
 
+        double numericAmount = 0;
+
         try {
-            Double.parseDouble(amount);
+            numericAmount = Double.parseDouble(amount);
         } catch (NumberFormatException e) {
             return false;
         }
 
-        return true;
+        return numericAmount > 0;
     }
 
     private static boolean isValidEmail(String email) {

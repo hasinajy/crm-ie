@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import site.easy.to.build.crm.exception.InvalidCsvFormatException;
+import site.easy.to.build.crm.service.csv.BudgetCsvImportService;
 import site.easy.to.build.crm.service.csv.CustomerCsvImportService;
 import site.easy.to.build.crm.service.csv.ExpenseCsvImportService;
 import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
@@ -41,7 +42,8 @@ public class CsvImportController {
     @PostMapping("/csv-import")
     public String processCsv(
             @RequestParam("customerCsvFile") MultipartFile customerCsv,
-            @RequestParam("expensesCsvFile") MultipartFile expenseCsv,
+            @RequestParam("budgetCsvFile") MultipartFile budgetCsv,
+            @RequestParam("expenseCsvFile") MultipartFile expenseCsv,
             RedirectAttributes redirectAttributes) {
 
         return transactionTemplate.execute(status -> {
@@ -49,7 +51,7 @@ public class CsvImportController {
             List<InvalidCsvFormatException> exceptions = new ArrayList<>();
             String pageRedirect = "redirect:/csv-import";
 
-            if (customerCsv.isEmpty() || expenseCsv.isEmpty()) {
+            if (customerCsv.isEmpty() || budgetCsv.isEmpty() || expenseCsv.isEmpty()) {
                 hasError = true;
                 redirectAttributes.addFlashAttribute("error",
                         "One or more files are missing. Please select all files to upload.");
@@ -57,10 +59,13 @@ public class CsvImportController {
                 try (
                         Reader customerReader = new BufferedReader(
                                 new InputStreamReader(customerCsv.getInputStream()));
+                        Reader budgetReader = new BufferedReader(
+                                new InputStreamReader(budgetCsv.getInputStream()));
                         Reader expenseReader = new BufferedReader(
                                 new InputStreamReader(expenseCsv.getInputStream()))) {
 
                     Iterable<CSVRecord> customerRecords = CSVFormat.DEFAULT.parse(customerReader);
+                    Iterable<CSVRecord> budgetRecords = CSVFormat.DEFAULT.parse(budgetReader);
                     Iterable<CSVRecord> expenseRecords = CSVFormat.DEFAULT.parse(expenseReader);
 
                     CustomerCsvImportService customerCsvImportService = new CustomerCsvImportService(
@@ -72,12 +77,25 @@ public class CsvImportController {
                         exceptions.addAll(customerCsvImportService.getExceptions());
                     }
 
+                    BudgetCsvImportService budgetCsvImportService = new BudgetCsvImportService(
+                            budgetCsv.getOriginalFilename(),
+                            budgetRecords,
+                            customerCsvImportService,
+                            customerService);
+                    budgetCsvImportService.processBudgetCsv();
+
+                    if (budgetCsvImportService.hasError()) {
+                        hasError = true;
+                        exceptions.addAll(budgetCsvImportService.getExceptions());
+                    }
+
                     ExpenseCsvImportService expenseCsvImportService = new ExpenseCsvImportService(
                             expenseCsv.getOriginalFilename(),
                             expenseRecords,
                             customerCsvImportService,
                             userService,
-                            customerService, leadService);
+                            customerService,
+                            leadService);
                     expenseCsvImportService.processCustomerCsv();
 
                     if (expenseCsvImportService.hasError()) {
