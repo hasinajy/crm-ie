@@ -27,6 +27,9 @@ public class DbResetService {
         entityManager.createNativeQuery("TRUNCATE TABLE ticket_settings").executeUpdate();
         entityManager.createNativeQuery("TRUNCATE TABLE file").executeUpdate();
         entityManager.createNativeQuery("TRUNCATE TABLE google_drive_file").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE customer_budget").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE lead_expense").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE ticket_expense").executeUpdate();
 
         entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
     }
