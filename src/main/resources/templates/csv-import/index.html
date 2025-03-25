@@ -81,7 +81,7 @@
                                     <ul>
                                         <li th:each="invalidError : ${invalidFormatErrors}">
                                             <span
-                                                th:text="'File: ' + ${invalidError.file} + ', Line: ' + ${invalidError.lineNumber} + ', Message: ' + ${invalidError.message}"></span>
+                                                th:text="'File: ' + ${invalidError.filename} + ', Line: ' + ${invalidError.lineNumber} + ', Message: ' + ${invalidError.errorMessage}"></span>
                                         </li>
                                     </ul>
                                 </div>
