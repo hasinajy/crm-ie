@@ -41,6 +41,10 @@ public class CustomerCsvImportService {
     /* --------------------------- Processing methods --------------------------- */
 
     public void save() {
+        if (hasError()) {
+            return;
+        }
+
         List<Customer> savedCustomers = new ArrayList<>();
         User user = new User();
         user.setId(52);
@@ -95,7 +99,7 @@ public class CustomerCsvImportService {
 
         // Fillers
         customer.setPosition("Default Position");
-        customer.setPhone("Default Phone Number ####");
+        customer.setPhone("####");
         customer.setAddress("Default Address");
         customer.setCity("Default City");
         customer.setState("Default State");
