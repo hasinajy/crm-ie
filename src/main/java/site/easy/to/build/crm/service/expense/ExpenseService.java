@@ -11,7 +11,10 @@ import site.easy.to.build.crm.repository.ExpenseThresholdRepository;
 import site.easy.to.build.crm.service.budget.CustomerBudgetService;
 import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,18 +77,27 @@ public class ExpenseService {
         List<LeadExpense> allLeadExpenses = leadExpenseService.getAllLeadExpenses();
         List<TicketExpense> allTicketExpenses = ticketExpenseService.getAllTicketExpenses();
 
-        // Group expenses by customer and calculate totals
-        return allLeadExpenses.stream()
-                .collect(Collectors.groupingBy(leadExpense -> leadExpense.getLead().getCustomer().getName()))
-                .entrySet().stream()
-                .map(entry -> {
-                    String customerName = entry.getKey();
-                    double totalLead = entry.getValue().stream().mapToDouble(LeadExpense::getAmount).sum();
-                    double totalTicket = allTicketExpenses.stream()
-                            .filter(ticketExpense -> ticketExpense.getTicket().getCustomer().getName()
-                                    .equals(customerName))
-                            .mapToDouble(TicketExpense::getAmount)
-                            .sum();
+        // Create maps of totals by customer name
+        Map<String, Double> leadTotals = allLeadExpenses.stream()
+                .collect(Collectors.groupingBy(
+                        leadExpense -> leadExpense.getLead().getCustomer().getName(),
+                        Collectors.summingDouble(LeadExpense::getAmount)));
+
+        Map<String, Double> ticketTotals = allTicketExpenses.stream()
+                .collect(Collectors.groupingBy(
+                        ticketExpense -> ticketExpense.getTicket().getCustomer().getName(),
+                        Collectors.summingDouble(TicketExpense::getAmount)));
+
+        // Get all unique customer names from both lead and ticket expenses
+        Set<String> allCustomers = new HashSet<>();
+        allCustomers.addAll(leadTotals.keySet());
+        allCustomers.addAll(ticketTotals.keySet());
+
+        // Create DTOs for all customers
+        return allCustomers.stream()
+                .map(customerName -> {
+                    double totalLead = leadTotals.getOrDefault(customerName, 0.0);
+                    double totalTicket = ticketTotals.getOrDefault(customerName, 0.0);
                     TotalExpenseDto dto = new TotalExpenseDto();
                     dto.setCustomerName(customerName);
                     dto.setTotalLeadExpenses(totalLead);
