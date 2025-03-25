@@ -18,20 +18,25 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import site.easy.to.build.crm.exception.InvalidCsvFormatException;
+import site.easy.to.build.crm.service.budget.CustomerBudgetService;
 import site.easy.to.build.crm.service.csv.BudgetCsvImportService;
 import site.easy.to.build.crm.service.csv.CustomerCsvImportService;
 import site.easy.to.build.crm.service.csv.ExpenseCsvImportService;
 import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
 import site.easy.to.build.crm.service.lead.LeadServiceImpl;
+import site.easy.to.build.crm.service.ticket.TicketServiceImpl;
 import site.easy.to.build.crm.service.user.UserServiceImpl;
 
 @Controller
 @RequiredArgsConstructor
 public class CsvImportController {
+    private final TransactionTemplate transactionTemplate;
+
     private final UserServiceImpl userService;
     private final CustomerServiceImpl customerService;
     private final LeadServiceImpl leadService;
-    private final TransactionTemplate transactionTemplate;
+    private final TicketServiceImpl ticketService;
+    private final CustomerBudgetService customerBudgetService;
 
     @GetMapping("/csv-import")
     public String displayCsvImportForm() {
@@ -68,8 +73,11 @@ public class CsvImportController {
                     Iterable<CSVRecord> expenseRecords = CSVFormat.DEFAULT.parse(expenseReader);
 
                     CustomerCsvImportService customerCsvImportService = new CustomerCsvImportService(
-                            customerCsv.getOriginalFilename(), customerRecords);
+                            customerCsv.getOriginalFilename(),
+                            customerRecords,
+                            customerService);
                     customerCsvImportService.processCustomerCsv();
+                    customerCsvImportService.save();
 
                     if (customerCsvImportService.hasError()) {
                         hasError = true;
@@ -80,8 +88,10 @@ public class CsvImportController {
                             budgetCsv.getOriginalFilename(),
                             budgetRecords,
                             customerCsvImportService,
-                            customerService);
+                            customerService,
+                            customerBudgetService);
                     budgetCsvImportService.processBudgetCsv();
+                    budgetCsvImportService.save();
 
                     if (budgetCsvImportService.hasError()) {
                         hasError = true;
@@ -94,7 +104,8 @@ public class CsvImportController {
                             customerCsvImportService,
                             userService,
                             customerService,
-                            leadService);
+                            leadService,
+                            ticketService);
                     expenseCsvImportService.processCustomerCsv();
 
                     if (expenseCsvImportService.hasError()) {
@@ -102,6 +113,7 @@ public class CsvImportController {
                         exceptions.addAll(expenseCsvImportService.getExceptions());
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     hasError = true;
                 }
             }
