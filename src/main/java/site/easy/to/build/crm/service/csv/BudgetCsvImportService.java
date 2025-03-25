@@ -56,17 +56,19 @@ public class BudgetCsvImportService {
     }
 
     public void save() {
-        List<CustomerBudget> budgets = new ArrayList<>();
-        for (CustomerBudget customerBudget : customerBudgets) {
-            Customer customer = getDbCustomer(customerBudget);
-            LocalDate today = LocalDate.now();
-            customerBudgetService.createBudget(
-                    customer.getCustomerId(),
-                    customerBudget.getAmount(),
-                    Date.valueOf(today),
-                    Date.valueOf(today.plusDays(1)));
+        if (!customerCsvImportService.hasError()) {
+            List<CustomerBudget> budgets = new ArrayList<>();
+            for (CustomerBudget customerBudget : customerBudgets) {
+                Customer customer = getDbCustomer(customerBudget);
+                LocalDate today = LocalDate.now();
+                customerBudgetService.createBudget(
+                        customer.getCustomerId(),
+                        customerBudget.getAmount(),
+                        Date.valueOf(today),
+                        Date.valueOf(today.plusDays(1)));
+            }
+            this.setCustomerBudgets(budgets);
         }
-        this.setCustomerBudgets(budgets);
     }
 
     public void processBudgetCsv() {

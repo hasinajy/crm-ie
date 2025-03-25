@@ -77,11 +77,12 @@ public class CsvImportController {
                             customerRecords,
                             customerService);
                     customerCsvImportService.processCustomerCsv();
-                    customerCsvImportService.save();
 
                     if (customerCsvImportService.hasError()) {
                         hasError = true;
                         exceptions.addAll(customerCsvImportService.getExceptions());
+                    } else {
+                        customerCsvImportService.save();
                     }
 
                     BudgetCsvImportService budgetCsvImportService = new BudgetCsvImportService(
@@ -91,11 +92,12 @@ public class CsvImportController {
                             customerService,
                             customerBudgetService);
                     budgetCsvImportService.processBudgetCsv();
-                    budgetCsvImportService.save();
 
                     if (budgetCsvImportService.hasError()) {
                         hasError = true;
                         exceptions.addAll(budgetCsvImportService.getExceptions());
+                    } else {
+                        budgetCsvImportService.save();
                     }
 
                     ExpenseCsvImportService expenseCsvImportService = new ExpenseCsvImportService(
