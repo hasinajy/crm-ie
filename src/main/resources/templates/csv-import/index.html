@@ -78,10 +78,15 @@
                                 <div th:if="${invalidFormatErrors != null and not #lists.isEmpty(invalidFormatErrors)}"
                                     class="alert alert-danger" role="alert">
                                     <strong>Invalid Format Errors:</strong>
-                                    <ul>
-                                        <li th:each="invalidError : ${invalidFormatErrors}">
-                                            <span
-                                                th:text="'File: ' + ${invalidError.filename} + ', Line: ' + ${invalidError.lineNumber} + ', Message: ' + ${invalidError.errorMessage}"></span>
+                                    <hr class="my-2" />
+                                    <ul class="list-unstyled">
+                                        <li th:each="invalidError : ${invalidFormatErrors}" class="mb-3">
+                                            <strong>File:</strong> <span
+                                                th:text="${invalidError.filename}"></span><br />
+                                            <strong>Line:</strong> <span
+                                                th:text="${invalidError.lineNumber}"></span><br />
+                                            <strong>Message:</strong> <span
+                                                th:text="${invalidError.errorMessage}"></span>
                                         </li>
                                     </ul>
                                 </div>
