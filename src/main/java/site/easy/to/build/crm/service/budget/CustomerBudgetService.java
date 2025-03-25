@@ -55,7 +55,7 @@ public class CustomerBudgetService {
         return customerBudgetRepository.findByCustomerBudgetId(customerBudgetId);
     }
 
-    public void updateBudget(CustomerBudget budget) {
+    public CustomerBudget updateBudget(CustomerBudget budget) {
         // List<CustomerBudget> overlaps =
         // customerBudgetRepository.findOverlappingBudgets(
         // budget.getCustomer().getCustomerId(), budget.getStartDate(),
@@ -63,7 +63,7 @@ public class CustomerBudgetService {
         // if (!overlaps.isEmpty()) {
         // throw new IllegalStateException("Overlapping budget exists");
         // }
-        customerBudgetRepository.save(budget);
+        return customerBudgetRepository.save(budget);
     }
 
     public void deleteBudget(Integer budgetId) {
