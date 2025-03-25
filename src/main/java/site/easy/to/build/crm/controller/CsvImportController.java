@@ -1,7 +1,6 @@
 package site.easy.to.build.crm.controller;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -102,7 +101,7 @@ public class CsvImportController {
                         hasError = true;
                         exceptions.addAll(expenseCsvImportService.getExceptions());
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     hasError = true;
                 }
             }

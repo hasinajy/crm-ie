@@ -4,13 +4,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import lombok.Data;
 import site.easy.to.build.crm.entity.CustomerBudget;
 import site.easy.to.build.crm.exception.InvalidCsvFormatException;
@@ -21,11 +17,10 @@ import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
 public class BudgetCsvImportService {
     private String filename;
     private Iterable<CSVRecord> budgetRecords;
-    private List<CustomerBudget> customerBudgets;
-    private List<InvalidCsvFormatException> exceptions;
+    private List<CustomerBudget> customerBudgets = new ArrayList<>();
+    private List<InvalidCsvFormatException> exceptions = new ArrayList<>();
 
     private CustomerCsvImportService customerCsvImportService;
-
     private final CustomerServiceImpl customerService;
 
     /* ------------------------------ Constructors ------------------------------ */
@@ -35,97 +30,58 @@ public class BudgetCsvImportService {
         this.customerService = customerService;
     }
 
-    public BudgetCsvImportService(
-            String filename,
-            Iterable<CSVRecord> budgetRecords,
-            CustomerCsvImportService customerCsvImportService,
-            CustomerServiceImpl customerService) {
-
-        this.setFilename(filename);
-        this.setBudgetRecords(budgetRecords);
-        this.setCustomerBudgets(new ArrayList<>());
-        this.setExceptions(new ArrayList<>());
-
+    public BudgetCsvImportService(String filename, Iterable<CSVRecord> budgetRecords,
+            CustomerCsvImportService customerCsvImportService, CustomerServiceImpl customerService) {
+        this.filename = filename;
+        this.budgetRecords = budgetRecords;
         this.customerCsvImportService = customerCsvImportService;
-
         this.customerService = customerService;
     }
 
+    /* --------------------------- Processing methods --------------------------- */
+
     public void processBudgetCsv() {
-        int counter = 1;
-        for (CSVRecord budgetRecord : this.getBudgetRecords()) {
-            if (counter > 1) {
-                CustomerBudget customerBudget = parseToCustomerBudget(budgetRecord, counter);
-                this.getCustomerBudgets().add(customerBudget);
+        int lineNumber = 1;
+        for (CSVRecord budgetRecord : budgetRecords) {
+            if (lineNumber > 1) { // Skip header
+                customerBudgets.add(parseToCustomerBudget(budgetRecord, lineNumber));
             }
-            counter++;
+            lineNumber++;
         }
     }
 
+    /* --------------------------- Validation methods --------------------------- */
+
     public boolean hasError() {
-        return !this.getExceptions().isEmpty();
+        return !exceptions.isEmpty();
     }
 
-    /* -------------------------------- Utilities ------------------------------- */
+    /* ----------------------------- Parsing methods ---------------------------- */
 
     private CustomerBudget parseToCustomerBudget(CSVRecord budgetRecord, int lineNumber) {
         CustomerBudget customerBudget = new CustomerBudget();
-
         String email = budgetRecord.get(0);
-        String strBudget = budgetRecord.get(1).replace(",", ".");
+        String strBudget = budgetRecord.get(1);
 
-        if (!isValidEmail(email)) {
-            this.getExceptions().add(
-                    new InvalidCsvFormatException(this.getFilename(), lineNumber, "Invalid email format provided"));
+        if (!CsvValidationUtils.isValidEmail(email)) {
+            exceptions.add(new InvalidCsvFormatException(filename, lineNumber, "Invalid email format provided"));
         }
 
-        if (!this.getCustomerCsvImportService().emailExists(email)) {
-            this.getExceptions().add(
-                    new InvalidCsvFormatException(this.getFilename(), lineNumber,
-                            "The customer with the provided email does not exist"));
+        if (!customerCsvImportService.emailExists(email)) {
+            exceptions.add(new InvalidCsvFormatException(filename, lineNumber,
+                    "The customer with the provided email does not exist"));
         }
 
-        if (!isValidBudgetAmount(strBudget)) {
-            strBudget = "0";
-            this.getExceptions().add(
-                    new InvalidCsvFormatException(this.getFilename(), lineNumber, "Invalid budget value provided"));
+        double amount = CsvValidationUtils.parseAmount(strBudget, "0");
+        if (!CsvValidationUtils.isValidAmount(strBudget)) {
+            exceptions.add(new InvalidCsvFormatException(filename, lineNumber, "Invalid budget value provided"));
         }
 
         LocalDate today = LocalDate.now();
-        LocalDate yearFromToday = today.plusYears(1);
-
-        customerBudget.setAmount(Double.parseDouble(strBudget));
+        customerBudget.setAmount(amount);
         customerBudget.setStartDate(Date.valueOf(today));
-        customerBudget.setEndDate(Date.valueOf(yearFromToday));
+        customerBudget.setEndDate(Date.valueOf(today.plusYears(1)));
 
         return customerBudget;
-    }
-
-    private static boolean isValidBudgetAmount(String amount) {
-        if (amount == null || amount.isEmpty()) {
-            return false;
-        }
-
-        double numericAmount = 0;
-
-        try {
-            numericAmount = Double.parseDouble(amount);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return numericAmount > 0;
-    }
-
-    private static boolean isValidEmail(String email) {
-        if (email == null || email.isEmpty()) {
-            return false;
-        }
-
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher = pattern.matcher(email);
-
-        return matcher.matches();
     }
 }
