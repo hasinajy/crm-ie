@@ -131,7 +131,7 @@ public class CsvImportController {
             if (hasError) {
                 status.setRollbackOnly();
                 redirectAttributes.addFlashAttribute("invalidFormatErrors", exceptions);
-                redirectAttributes.addFlashAttribute("message", "Failed to process CSV files.");
+                redirectAttributes.addFlashAttribute("error", "Failed to process CSV files.");
             } else {
                 redirectAttributes.addFlashAttribute("message", "CSV file uploaded and processed successfully!");
             }

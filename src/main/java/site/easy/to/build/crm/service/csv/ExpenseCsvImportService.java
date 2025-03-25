@@ -222,7 +222,7 @@ public class ExpenseCsvImportService {
             lead.setManager(user);
             lead.setEmployee(user);
 
-            if (!customerCsvImportService.hasError()) {
+            if (!customerCsvImportService.hasError() && !hasError()) {
                 lead.setCustomer(customer);
                 lead = leadService.save(lead);
             }
@@ -242,7 +242,7 @@ public class ExpenseCsvImportService {
             ticket.setManager(user);
             ticket.setEmployee(user);
 
-            if (!customerCsvImportService.hasError()) {
+            if (!customerCsvImportService.hasError() && !hasError()) {
                 ticket.setCustomer(customer);
                 ticket = ticketService.save(ticket);
             }

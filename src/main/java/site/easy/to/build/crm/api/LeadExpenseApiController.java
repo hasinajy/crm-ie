@@ -76,5 +76,4 @@ public class LeadExpenseApiController {
                     .body("Error deleting lead expense");
         }
     }
-
 }
