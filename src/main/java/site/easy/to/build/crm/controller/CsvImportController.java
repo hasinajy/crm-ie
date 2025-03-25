@@ -23,6 +23,8 @@ import site.easy.to.build.crm.service.csv.BudgetCsvImportService;
 import site.easy.to.build.crm.service.csv.CustomerCsvImportService;
 import site.easy.to.build.crm.service.csv.ExpenseCsvImportService;
 import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
+import site.easy.to.build.crm.service.expense.LeadExpenseService;
+import site.easy.to.build.crm.service.expense.TicketExpenseService;
 import site.easy.to.build.crm.service.lead.LeadServiceImpl;
 import site.easy.to.build.crm.service.ticket.TicketServiceImpl;
 import site.easy.to.build.crm.service.user.UserServiceImpl;
@@ -37,6 +39,8 @@ public class CsvImportController {
     private final LeadServiceImpl leadService;
     private final TicketServiceImpl ticketService;
     private final CustomerBudgetService customerBudgetService;
+    private final LeadExpenseService leadExpenseService;
+    private final TicketExpenseService ticketExpenseService;
 
     @GetMapping("/csv-import")
     public String displayCsvImportForm() {
@@ -107,12 +111,16 @@ public class CsvImportController {
                             userService,
                             customerService,
                             leadService,
-                            ticketService);
+                            ticketService,
+                            leadExpenseService,
+                            ticketExpenseService);
                     expenseCsvImportService.processCustomerCsv();
 
                     if (expenseCsvImportService.hasError()) {
                         hasError = true;
                         exceptions.addAll(expenseCsvImportService.getExceptions());
+                    } else {
+                        expenseCsvImportService.save();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

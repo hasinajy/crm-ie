@@ -1,6 +1,7 @@
 package site.easy.to.build.crm.service.csv;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,11 +9,18 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.Data;
+import site.easy.to.build.crm.entity.Customer;
+import site.easy.to.build.crm.entity.Lead;
 import site.easy.to.build.crm.entity.LeadExpense;
+import site.easy.to.build.crm.entity.Ticket;
 import site.easy.to.build.crm.entity.TicketExpense;
+import site.easy.to.build.crm.entity.User;
 import site.easy.to.build.crm.exception.InvalidCsvFormatException;
 import site.easy.to.build.crm.service.customer.CustomerServiceImpl;
+import site.easy.to.build.crm.service.expense.LeadExpenseService;
+import site.easy.to.build.crm.service.expense.TicketExpenseService;
 import site.easy.to.build.crm.service.lead.LeadServiceImpl;
+import site.easy.to.build.crm.service.ticket.TicketServiceImpl;
 import site.easy.to.build.crm.service.user.UserServiceImpl;
 
 @Service
@@ -29,6 +37,9 @@ public class ExpenseCsvImportService {
     private final UserServiceImpl userService;
     private final CustomerServiceImpl customerService;
     private final LeadServiceImpl leadService;
+    private final TicketServiceImpl ticketService;
+    private final LeadExpenseService leadExpenseService;
+    private final TicketExpenseService ticketExpenseService;
 
     /* ------------------------------ Constructors ------------------------------ */
 
@@ -36,11 +47,17 @@ public class ExpenseCsvImportService {
     public ExpenseCsvImportService(
             UserServiceImpl userService,
             CustomerServiceImpl customerService,
-            LeadServiceImpl leadService) {
+            LeadServiceImpl leadService,
+            TicketServiceImpl ticketService,
+            LeadExpenseService leadExpenseService,
+            TicketExpenseService ticketExpenseService) {
 
         this.userService = userService;
         this.customerService = customerService;
         this.leadService = leadService;
+        this.ticketService = ticketService;
+        this.leadExpenseService = leadExpenseService;
+        this.ticketExpenseService = ticketExpenseService;
     }
 
     public ExpenseCsvImportService(
@@ -49,7 +66,10 @@ public class ExpenseCsvImportService {
             CustomerCsvImportService customerCsvImportService,
             UserServiceImpl userService,
             CustomerServiceImpl customerService,
-            LeadServiceImpl leadService) {
+            LeadServiceImpl leadService,
+            TicketServiceImpl ticketService,
+            LeadExpenseService leadExpenseService,
+            TicketExpenseService ticketExpenseService) {
 
         this.filename = filename;
         this.expenseRecords = expenseRecords;
@@ -57,9 +77,34 @@ public class ExpenseCsvImportService {
         this.userService = userService;
         this.customerService = customerService;
         this.leadService = leadService;
+        this.ticketService = ticketService;
+        this.leadExpenseService = leadExpenseService;
+        this.ticketExpenseService = ticketExpenseService;
     }
 
     /* --------------------------- Processing methods --------------------------- */
+
+    public void save() {
+        if (customerCsvImportService.hasError() || hasError()) {
+            return;
+        }
+
+        List<LeadExpense> savedLeadExpenses = new ArrayList<>();
+        List<TicketExpense> savedTicketExpenses = new ArrayList<>();
+
+        for (LeadExpense leadExpense : leadExpenses) {
+            leadExpense = leadExpenseService.createLeadExpense(leadExpense);
+            savedLeadExpenses.add(leadExpense);
+        }
+
+        for (TicketExpense ticketExpense : ticketExpenses) {
+            ticketExpense = ticketExpenseService.createTicketExpense(ticketExpense);
+            savedTicketExpenses.add(ticketExpense);
+        }
+
+        this.setLeadExpenses(savedLeadExpenses);
+        this.setTicketExpenses(savedTicketExpenses);
+    }
 
     public void processCustomerCsv() {
         int lineNumber = 1;
@@ -109,31 +154,33 @@ public class ExpenseCsvImportService {
 
     private LeadExpense parseToLeadExpense(CSVRecord expenseRecord, int lineNumber) {
         LeadExpense leadExpense = new LeadExpense();
-        validateCommonFields(expenseRecord, lineNumber);
-
+        String email = expenseRecord.get(0);
+        String label = expenseRecord.get(1);
         String status = expenseRecord.get(3);
+        double amount = CsvValidationUtils.parseAmount(expenseRecord.get(4), "0");
+
         if (!isValidLeadStatus(status)) {
             exceptions.add(new InvalidCsvFormatException(filename, lineNumber, "Invalid status value provided"));
         }
 
-        String label = expenseRecord.get(1);
-        double amount = CsvValidationUtils.parseAmount(expenseRecord.get(4), "0");
-        populateExpense(leadExpense, label, amount);
+        validateCommonFields(expenseRecord, lineNumber);
+        populateExpense(leadExpense, label, amount, status, email);
         return leadExpense;
     }
 
     private TicketExpense parseToTicketExpense(CSVRecord expenseRecord, int lineNumber) {
         TicketExpense ticketExpense = new TicketExpense();
-        validateCommonFields(expenseRecord, lineNumber);
-
+        String email = expenseRecord.get(0);
+        String label = expenseRecord.get(1);
         String status = expenseRecord.get(3);
+        double amount = CsvValidationUtils.parseAmount(expenseRecord.get(4), "0");
+
         if (!isValidTicketStatus(status)) {
             exceptions.add(new InvalidCsvFormatException(filename, lineNumber, "Invalid status value provided"));
         }
 
-        String label = expenseRecord.get(1);
-        double amount = CsvValidationUtils.parseAmount(expenseRecord.get(4), "0");
-        populateExpense(ticketExpense, label, amount);
+        validateCommonFields(expenseRecord, lineNumber);
+        populateExpense(ticketExpense, label, amount, status, email);
         return ticketExpense;
     }
 
@@ -155,15 +202,55 @@ public class ExpenseCsvImportService {
         }
     }
 
-    private void populateExpense(Object expense, String label, double amount) {
-        if (expense instanceof LeadExpense lead) {
-            lead.setDescription("Expense for " + label);
-            lead.setAmount(amount);
-            lead.setDate(LocalDate.now());
-        } else if (expense instanceof TicketExpense ticket) {
-            ticket.setDescription("Expense for " + label);
-            ticket.setAmount(amount);
-            ticket.setDate(LocalDate.now());
+    private void populateExpense(Object expense, String label, double amount, String status, String email) {
+        User user = new User();
+        Customer customer = new Customer();
+        customer.setEmail(email);
+
+        if (!customerCsvImportService.hasError()) {
+            user = userService.findByUsername("hasina").get(0);
+            customer = customerService.findByEmail(email);
+        }
+
+        if (expense instanceof LeadExpense leadExpense) {
+            Lead lead = new Lead();
+            lead.setName(label);
+            lead.setStatus(status);
+            lead.setPhone("Number");
+            lead.setCreatedAt(LocalDateTime.now());
+            lead.setCustomer(customer);
+            lead.setManager(user);
+            lead.setEmployee(user);
+
+            if (!customerCsvImportService.hasError()) {
+                lead.setCustomer(customer);
+                lead = leadService.save(lead);
+            }
+
+            leadExpense.setDescription("Expense for " + label);
+            leadExpense.setAmount(amount);
+            leadExpense.setDate(LocalDate.now());
+            leadExpense.setLead(lead);
+        } else if (expense instanceof TicketExpense ticketExpense) {
+            Ticket ticket = new Ticket();
+            ticket.setSubject(label);
+            ticket.setDescription("Default Description");
+            ticket.setStatus(status);
+            ticket.setPriority("low");
+            ticket.setCreatedAt(LocalDateTime.now());
+            ticket.setCustomer(customer);
+            ticket.setManager(user);
+            ticket.setEmployee(user);
+
+            if (!customerCsvImportService.hasError()) {
+                ticket.setCustomer(customer);
+                ticket = ticketService.save(ticket);
+            }
+
+            ticketExpense.setDescription("Expense for " + label);
+            ticketExpense.setAmount(amount);
+            ticketExpense.setDate(LocalDate.now());
+            ticketExpense.setTicket(ticket);
         }
     }
 
