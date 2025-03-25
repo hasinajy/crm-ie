@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,10 @@ public class CustomerCsvImportService {
     }
 
     public CustomerCsvImportService(String filename, Iterable<CSVRecord> customerRecords) {
+        this.setFilename(filename);
         this.setCustomerRecords(customerRecords);
         this.setCustomers(new ArrayList<>());
         this.setExceptions(new ArrayList<>());
-        this.setFilename(filename);
     }
 
     /* ----------------------------- Service methods ---------------------------- */
@@ -80,5 +81,23 @@ public class CustomerCsvImportService {
         Matcher matcher = pattern.matcher(email);
 
         return matcher.matches();
+    }
+
+    public List<String> getAllEmails() {
+        if (this.getCustomers() == null) {
+            return new ArrayList<>();
+        }
+
+        return this.getCustomers().stream()
+                .map(Customer::getEmail)
+                .collect(Collectors.toList());
+    }
+
+    public boolean emailExists(String email) {
+        if (this.getCustomers() == null || email == null || email.isEmpty()) {
+            return false;
+        }
+        return this.getCustomers().stream()
+                .anyMatch(customer -> customer.getEmail().equalsIgnoreCase(email));
     }
 }
