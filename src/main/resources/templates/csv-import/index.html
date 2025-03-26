@@ -82,6 +82,7 @@
                                 <div th:if="${invalidFormatErrors != null and not #lists.isEmpty(invalidFormatErrors)}"
                                     class="alert alert-danger" role="alert">
                                     <strong>Invalid Format Errors:</strong>
+                                    <span th:text="'(' + ${#lists.size(invalidFormatErrors)} + ' errors)'"></span>
                                     <hr class="my-2" />
                                     <ul class="list-unstyled">
                                         <li th:each="invalidError : ${invalidFormatErrors}" class="mb-3">
