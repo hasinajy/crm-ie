@@ -60,7 +60,14 @@ public class CustomerBudgetController {
             budget.setEndDate(endDate);
             budgetService.createBudget(customerId, amount, startDate, endDate);
 
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative");
+            }
+
             return "redirect:/budgets";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "customer-budget/form";
         } catch (Exception e) {
             model.addAttribute("error", "An error occurred while creating the budget");
             return "customer-budget/form";

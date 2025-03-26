@@ -40,6 +40,11 @@ public class ExpenseThresholdApiController {
             }
 
             double newValue = ((Number) requestBody.get("value")).doubleValue();
+
+            if (newValue < 0) {
+                return ResponseEntity.badRequest().body("Value must be greater than or equal to 0.");
+            }
+
             expenseService.updateExpenseThreshold(newValue);
 
             Gson gson = new Gson();
