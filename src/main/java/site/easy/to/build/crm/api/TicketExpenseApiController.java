@@ -46,6 +46,14 @@ public class TicketExpenseApiController {
             String description = (String) requestBody.get("description");
             double amount = Double.parseDouble((String) requestBody.get("amount"));
 
+            if (amount < 0) {
+                return ResponseEntity.badRequest().body("Amount must be greater than or equal to 0.");
+            }
+
+            if (Double.valueOf(description).isNaN()) {
+                return ResponseEntity.badRequest().body("Amount must be a number.");
+            }
+
             TicketExpense ticketExpense = ticketExpenseService.getTicketExpenseById(id);
             ticketExpense.setDescription(description);
             ticketExpense.setAmount(amount);
