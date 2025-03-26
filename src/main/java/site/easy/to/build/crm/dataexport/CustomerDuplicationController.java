@@ -58,6 +58,7 @@ public class CustomerDuplicationController {
             final String BUDGET_HEADER = "customer_email,Budget\n";
             final String EXPENSE_HEADER = "customer_email,subject_or_name,type,status,expense\n";
             final String LEAD_HEADER = "name,status,phone,manager_name,employee_name,customer_email\n";
+            final String TICKET_HEADER = "subject,description,status,priority,manager_name,employee_name,customer_email\n";
 
             String emailCopy = CustomerDuplicationUtil.getEmailCopy(customer.getEmail());
 
@@ -92,6 +93,14 @@ public class CustomerDuplicationController {
                 writer.write(getLeadCsv(lead, emailCopy));
                 writer.write(NEW_LINE);
             }
+            writer.write(CSV_SEPARATOR);
+
+            // Write all ticket data
+            writer.write(TICKET_HEADER);
+            for (Ticket ticket : tickets) {
+                writer.write(getTicketCsv(ticket, emailCopy));
+                writer.write(NEW_LINE);
+            }
         } catch (IOException e) {
             throw new IOException("Error writing CSV to response", e);
         }
@@ -104,6 +113,19 @@ public class CustomerDuplicationController {
                 escapeCsv(lead.getName()),
                 escapeCsv(lead.getStatus()),
                 escapeCsv(lead.getPhone() != null ? lead.getPhone() : ""),
+                escapeCsv(managerName),
+                escapeCsv(employeeName),
+                escapeCsv(customerEmail));
+    }
+
+    private String getTicketCsv(Ticket ticket, String customerEmail) {
+        String managerName = ticket.getManager() != null ? ticket.getManager().getUsername() : "N/A";
+        String employeeName = ticket.getEmployee() != null ? ticket.getEmployee().getUsername() : "N/A";
+        return String.format("%s,%s,%s,%s,%s,%s,%s",
+                escapeCsv(ticket.getSubject()),
+                escapeCsv(ticket.getDescription() != null ? ticket.getDescription() : ""),
+                escapeCsv(ticket.getStatus()),
+                escapeCsv(ticket.getPriority()),
                 escapeCsv(managerName),
                 escapeCsv(employeeName),
                 escapeCsv(customerEmail));
