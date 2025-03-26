@@ -54,20 +54,21 @@ public class CustomerCsvExportService {
         final String CSV_SEPARATOR = "\n\n";
         final String NEW_LINE = "\n";
 
-        final String CUSTOMER_HEADER = "customer_email,customer_name\n";
-        final String BUDGET_HEADER = "customer_email,Budget\n";
-        final String EXPENSE_HEADER = "customer_email,subject_or_name,type,status,expense\n";
-        final String LEAD_HEADER = "name,status,phone,manager_name,employee_name,customer_email\n";
-        final String TICKET_HEADER = "subject,description,status,priority,manager_name,employee_name,customer_email\n";
+        // Updated headers with prefixes to differentiate sections
+        final String CUSTOMER_HEADER = "CUSTOMER:customer_email,customer_name\n";
+        final String BUDGET_HEADER = "BUDGET:customer_email,Budget\n";
+        final String EXPENSE_HEADER = "EXPENSE:customer_email,subject_or_name,type,status,expense\n";
+        final String LEAD_HEADER = "LEAD:name,status,phone,manager_name,employee_name,customer_email\n";
+        final String TICKET_HEADER = "TICKET:subject,description,status,priority,manager_name,employee_name,customer_email\n";
 
         String emailCopy = CustomerDuplicationUtil.getEmailCopy(customer.getEmail());
 
-        // Write all customer data
+        // Write customer data
         writer.write(CUSTOMER_HEADER);
         writer.write(CustomerDuplicationUtil.getCustomerCsv(customer));
         writer.write(CSV_SEPARATOR);
 
-        // Write all budget data
+        // Write budget data
         writer.write(BUDGET_HEADER);
         for (CustomerBudgetDto budget : customerBudgets) {
             writer.write(CustomerDuplicationUtil.getCustomerBudgetCsv(emailCopy, budget));
@@ -75,7 +76,7 @@ public class CustomerCsvExportService {
         }
         writer.write(CSV_SEPARATOR);
 
-        // Write all expense data
+        // Write expense data
         writer.write(EXPENSE_HEADER);
         for (LeadExpense leadExpense : leadExpenses) {
             writer.write(CustomerDuplicationUtil.getLeadExpenseCsv(emailCopy, leadExpense));
@@ -87,7 +88,7 @@ public class CustomerCsvExportService {
         }
         writer.write(CSV_SEPARATOR);
 
-        // Write all lead data
+        // Write lead data
         writer.write(LEAD_HEADER);
         for (Lead lead : leads) {
             writer.write(CustomerDuplicationUtil.getLeadCsv(lead, emailCopy));
@@ -95,7 +96,7 @@ public class CustomerCsvExportService {
         }
         writer.write(CSV_SEPARATOR);
 
-        // Write all ticket data
+        // Write ticket data
         writer.write(TICKET_HEADER);
         for (Ticket ticket : tickets) {
             writer.write(CustomerDuplicationUtil.getTicketCsv(ticket, emailCopy));
