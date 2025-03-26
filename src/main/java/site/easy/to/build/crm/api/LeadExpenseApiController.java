@@ -47,6 +47,14 @@ public class LeadExpenseApiController {
             String description = (String) requestBody.get("description");
             double amount = Double.parseDouble((String) requestBody.get("amount"));
 
+            if (amount < 0) {
+                return ResponseEntity.badRequest().body("Amount must be greater than or equal to 0.");
+            }
+
+            if (Double.valueOf(amount).isNaN()) {
+                return ResponseEntity.badRequest().body("Amount must be a number.");
+            }
+
             LeadExpense leadExpense = leadExpenseService.getLeadExpenseById(id);
             leadExpense.setDescription(description);
             leadExpense.setAmount(amount);

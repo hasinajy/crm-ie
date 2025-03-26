@@ -111,6 +111,10 @@ public class ExpenseController {
             leadExpense.setAmount(amount);
             leadExpense.setDate(date);
 
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative");
+            }
+
             Integer customerId = lead.getCustomer().getCustomerId();
             boolean budgetIsExceeded = expenseService.checkIfBudgetIsExceeded(customerId, amount);
 
@@ -124,6 +128,9 @@ public class ExpenseController {
             leadExpenseService.createLeadExpense(leadExpense);
 
             return "redirect:/expenses/leads";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "expense/lead-form";
         } catch (Exception e) {
             model.addAttribute("error", "Invalid data format");
             return "expense/lead-form";
@@ -171,6 +178,10 @@ public class ExpenseController {
             ticketExpense.setAmount(amount);
             ticketExpense.setDate(date);
 
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount cannot be negative");
+            }
+
             Integer customerId = ticket.getCustomer().getCustomerId();
             boolean budgetIsExceeded = expenseService.checkIfBudgetIsExceeded(customerId, amount);
 
@@ -184,8 +195,10 @@ public class ExpenseController {
             ticketExpenseService.createTicketExpense(ticketExpense);
 
             return "redirect:/expenses/tickets";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "expense/ticket-form";
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             model.addAttribute("error", "Invalid data format");
             return "expense/ticket-form";
         }

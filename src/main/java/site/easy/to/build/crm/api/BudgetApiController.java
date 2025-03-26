@@ -42,6 +42,11 @@ public class BudgetApiController {
 
         try {
             double amount = Double.parseDouble((String) requestBody.get("amount"));
+
+            if (amount < 0) {
+                return ResponseEntity.badRequest().body("Amount must be greater than or equal to 0.");
+            }
+
             CustomerBudget customerBudget = customerBudgetService.findById(id);
             customerBudget.setAmount(amount);
 
