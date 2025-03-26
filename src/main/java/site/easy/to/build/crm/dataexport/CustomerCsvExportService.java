@@ -56,7 +56,7 @@ public class CustomerCsvExportService {
 
         final String CUSTOMER_HEADER = "CUSTOMER:name,email,position,phone,address,city,state,country,description,twitter,facebook,youtube,user_username\n";
         final String BUDGET_HEADER = "BUDGET:customer_email,Budget\n";
-        final String EXPENSE_HEADER = "EXPENSE:customer_email,subject_or_name,type,status,expense\n";
+        final String EXPENSE_HEADER = "EXPENSE:type,label,description,amount\n";
         final String LEAD_HEADER = "LEAD:name,status,phone,manager_name,employee_name,customer_email\n";
         final String TICKET_HEADER = "TICKET:subject,description,status,priority,manager_name,employee_name,customer_email\n";
 
@@ -78,11 +78,11 @@ public class CustomerCsvExportService {
         // Write expense data
         writer.write(EXPENSE_HEADER);
         for (LeadExpense leadExpense : leadExpenses) {
-            writer.write(CustomerDuplicationUtil.getLeadExpenseCsv(emailCopy, leadExpense));
+            writer.write(CustomerDuplicationUtil.getLeadExpenseCsv(leadExpense));
             writer.write(NEW_LINE);
         }
         for (TicketExpense ticketExpense : ticketExpenses) {
-            writer.write(CustomerDuplicationUtil.getTicketExpenseCsv(emailCopy, ticketExpense));
+            writer.write(CustomerDuplicationUtil.getTicketExpenseCsv(ticketExpense));
             writer.write(NEW_LINE);
         }
         writer.write(CSV_SEPARATOR);

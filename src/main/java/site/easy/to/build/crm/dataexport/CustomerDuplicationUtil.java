@@ -19,25 +19,31 @@ public class CustomerDuplicationUtil {
     /**
      * Formats a ticket expense as a CSV row.
      *
-     * @param email         the customer email to include in the row
      * @param ticketExpense the ticket expense entity
      * @return a CSV-formatted string for the ticket expense
      */
-    public static String getTicketExpenseCsv(String email, TicketExpense ticketExpense) {
+    public static String getTicketExpenseCsv(TicketExpense ticketExpense) {
         Ticket ticket = ticketExpense.getTicket();
-        return email + "," + ticket.getSubject() + ",ticket," + ticket.getStatus() + "," + ticketExpense.getAmount();
+        return String.format("%s,%s,%s,%s",
+                escapeCsv("ticket"),
+                escapeCsv(ticket.getSubject()),
+                escapeCsv(ticketExpense.getDescription() != null ? ticketExpense.getDescription() : ""),
+                escapeCsv(ticketExpense.getAmount().toString()));
     }
 
     /**
      * Formats a lead expense as a CSV row.
      *
-     * @param email       the customer email to include in the row
      * @param leadExpense the lead expense entity
      * @return a CSV-formatted string for the lead expense
      */
-    public static String getLeadExpenseCsv(String email, LeadExpense leadExpense) {
+    public static String getLeadExpenseCsv(LeadExpense leadExpense) {
         Lead lead = leadExpense.getLead();
-        return email + "," + lead.getName() + ",lead," + lead.getStatus() + "," + leadExpense.getAmount();
+        return String.format("%s,%s,%s,%s",
+                escapeCsv("lead"),
+                escapeCsv(lead.getName()),
+                escapeCsv(leadExpense.getDescription() != null ? leadExpense.getDescription() : ""),
+                escapeCsv(leadExpense.getAmount().toString()));
     }
 
     /**
