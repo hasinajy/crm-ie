@@ -11,13 +11,13 @@ import site.easy.to.build.crm.entity.TicketExpense;
  * Utility class providing helper methods for formatting CSV rows for customer
  * data export.
  */
-public class CustomerDuplicationUtil {
+public class CustomerCsvExportUtil {
 
-    private CustomerDuplicationUtil() {
+    private CustomerCsvExportUtil() {
     }
 
     /**
-     * Formats a ticket expense as a CSV row.
+     * Formats a ticket expense as a CSV row for the enhanced format.
      *
      * @param ticketExpense the ticket expense entity
      * @return a CSV-formatted string for the ticket expense
@@ -32,7 +32,24 @@ public class CustomerDuplicationUtil {
     }
 
     /**
-     * Formats a lead expense as a CSV row.
+     * Formats a ticket expense as a CSV row for the original format.
+     *
+     * @param email         the customer email to include in the row
+     * @param ticketExpense the ticket expense entity
+     * @return a CSV-formatted string for the ticket expense
+     */
+    public static String getTicketExpenseCsvOriginal(String email, TicketExpense ticketExpense) {
+        Ticket ticket = ticketExpense.getTicket();
+        return String.format("%s,%s,%s,%s,%s",
+                escapeCsv(email),
+                escapeCsv(ticket.getSubject()),
+                escapeCsv("ticket"),
+                escapeCsv(ticket.getStatus()),
+                escapeCsv(ticketExpense.getAmount().toString()));
+    }
+
+    /**
+     * Formats a lead expense as a CSV row for the enhanced format.
      *
      * @param leadExpense the lead expense entity
      * @return a CSV-formatted string for the lead expense
@@ -43,6 +60,23 @@ public class CustomerDuplicationUtil {
                 escapeCsv("lead"),
                 escapeCsv(lead.getName()),
                 escapeCsv(leadExpense.getDescription() != null ? leadExpense.getDescription() : ""),
+                escapeCsv(leadExpense.getAmount().toString()));
+    }
+
+    /**
+     * Formats a lead expense as a CSV row for the original format.
+     *
+     * @param email       the customer email to include in the row
+     * @param leadExpense the lead expense entity
+     * @return a CSV-formatted string for the lead expense
+     */
+    public static String getLeadExpenseCsvOriginal(String email, LeadExpense leadExpense) {
+        Lead lead = leadExpense.getLead();
+        return String.format("%s,%s,%s,%s,%s",
+                escapeCsv(email),
+                escapeCsv(lead.getName()),
+                escapeCsv("lead"),
+                escapeCsv(lead.getStatus()),
                 escapeCsv(leadExpense.getAmount().toString()));
     }
 
@@ -58,7 +92,8 @@ public class CustomerDuplicationUtil {
     }
 
     /**
-     * Formats a customer as a CSV row with all required fields.
+     * Formats a customer as a CSV row with all required fields for the enhanced
+     * format.
      *
      * @param customer the customer entity
      * @return a CSV-formatted string for the customer
@@ -82,6 +117,18 @@ public class CustomerDuplicationUtil {
     }
 
     /**
+     * Formats a customer as a CSV row for the original format.
+     *
+     * @param customer the customer entity
+     * @return a CSV-formatted string for the customer
+     */
+    public static String getCustomerCsvOriginal(Customer customer) {
+        return String.format("%s,%s",
+                escapeCsv(getEmailCopy(customer.getEmail())),
+                escapeCsv(customer.getName()));
+    }
+
+    /**
      * Generates a modified email address for duplication purposes.
      *
      * @param email the original email address
@@ -102,7 +149,7 @@ public class CustomerDuplicationUtil {
     }
 
     /**
-     * Formats a lead as a CSV row.
+     * Formats a lead as a CSV row for the enhanced format.
      *
      * @param lead          the lead entity
      * @param customerEmail the customer email to include in the row
@@ -121,7 +168,7 @@ public class CustomerDuplicationUtil {
     }
 
     /**
-     * Formats a ticket as a CSV row.
+     * Formats a ticket as a CSV row for the enhanced format.
      *
      * @param ticket        the ticket entity
      * @param customerEmail the customer email to include in the row
