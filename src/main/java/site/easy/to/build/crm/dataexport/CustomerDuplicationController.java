@@ -27,7 +27,7 @@ public class CustomerDuplicationController {
     private final LeadExpenseService leadExpenseService;
     private final TicketExpenseService ticketExpenseService;
 
-    @GetMapping("/customers/duplicate")
+    @GetMapping("/customers/download-csv")
     public void downloadCustomerData(
             @RequestParam("customerId") Integer customerId,
             HttpServletResponse response) throws IOException {

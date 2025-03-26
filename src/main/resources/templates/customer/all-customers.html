@@ -105,7 +105,7 @@
                                                 <td th:text="${customer.phone}"></td>
                                                 <td th:text="${customer.country}"></td>
                                                 <td>
-                                                    <a th:href="@{/customers/duplicate(customerId=${customer.customerId})}"
+                                                    <a th:href="@{/customers/download-csv(customerId=${customer.customerId})}"
                                                         class="btn btn-primary">
                                                         Duplicate
                                                     </a>
