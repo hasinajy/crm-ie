@@ -54,8 +54,7 @@ public class CustomerCsvExportService {
         final String CSV_SEPARATOR = "\n\n";
         final String NEW_LINE = "\n";
 
-        // Updated headers with prefixes to differentiate sections
-        final String CUSTOMER_HEADER = "CUSTOMER:customer_email,customer_name\n";
+        final String CUSTOMER_HEADER = "CUSTOMER:name,email,position,phone,address,city,state,country,description,twitter,facebook,youtube,user_username\n";
         final String BUDGET_HEADER = "BUDGET:customer_email,Budget\n";
         final String EXPENSE_HEADER = "EXPENSE:customer_email,subject_or_name,type,status,expense\n";
         final String LEAD_HEADER = "LEAD:name,status,phone,manager_name,employee_name,customer_email\n";

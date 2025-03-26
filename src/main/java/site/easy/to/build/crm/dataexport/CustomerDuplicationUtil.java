@@ -52,13 +52,27 @@ public class CustomerDuplicationUtil {
     }
 
     /**
-     * Formats a customer as a CSV row.
+     * Formats a customer as a CSV row with all required fields.
      *
      * @param customer the customer entity
      * @return a CSV-formatted string for the customer
      */
     public static String getCustomerCsv(Customer customer) {
-        return getEmailCopy(customer.getEmail()) + "," + getNameCopy(customer.getName());
+        String userUsername = customer.getUser() != null ? customer.getUser().getUsername() : "N/A";
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
+                escapeCsv(getNameCopy(customer.getName())),
+                escapeCsv(getEmailCopy(customer.getEmail())),
+                escapeCsv(customer.getPosition() != null ? customer.getPosition() : ""),
+                escapeCsv(customer.getPhone() != null ? customer.getPhone() : ""),
+                escapeCsv(customer.getAddress() != null ? customer.getAddress() : ""),
+                escapeCsv(customer.getCity() != null ? customer.getCity() : ""),
+                escapeCsv(customer.getState() != null ? customer.getState() : ""),
+                escapeCsv(customer.getCountry() != null ? customer.getCountry() : ""),
+                escapeCsv(customer.getDescription() != null ? customer.getDescription() : ""),
+                escapeCsv(customer.getTwitter() != null ? customer.getTwitter() : ""),
+                escapeCsv(customer.getFacebook() != null ? customer.getFacebook() : ""),
+                escapeCsv(customer.getYoutube() != null ? customer.getYoutube() : ""),
+                escapeCsv(userUsername));
     }
 
     /**
