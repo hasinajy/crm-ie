@@ -40,10 +40,11 @@ public class CustomerCsvExportService {
      * provided writer.
      *
      * @param customerId the ID of the customer whose data is to be exported
+     * @param format     the desired output format ("original" or "enhanced")
      * @param writer     the PrintWriter to write the CSV content to
      * @throws IOException if an error occurs while writing the CSV content
      */
-    public void generateCustomerCsv(Integer customerId, PrintWriter writer) throws IOException {
+    public void generateCustomerCsv(Integer customerId, String format, PrintWriter writer) throws IOException {
         Customer customer = customerService.findByCustomerId(customerId);
         List<CustomerBudgetDto> customerBudgets = customerBudgetService.getBudgetsByCustomerId(customerId);
         List<Lead> leads = leadService.getCustomerLeads(customerId);
@@ -54,52 +55,87 @@ public class CustomerCsvExportService {
         final String CSV_SEPARATOR = "\n\n";
         final String NEW_LINE = "\n";
 
-        final String CUSTOMER_HEADER = "CUSTOMER:name,email,position,phone,address,city,state,country,description,twitter,facebook,youtube,user_username\n";
-        final String BUDGET_HEADER = "BUDGET:customer_email,Budget\n";
-        final String EXPENSE_HEADER = "EXPENSE:type,label,description,amount\n";
-        final String LEAD_HEADER = "LEAD:name,status,phone,manager_name,employee_name,customer_email\n";
-        final String TICKET_HEADER = "TICKET:subject,description,status,priority,manager_name,employee_name,customer_email\n";
+        if ("original".equalsIgnoreCase(format)) {
+            // Original format headers
+            final String CUSTOMER_HEADER = "customer_email,customer_name\n";
+            final String BUDGET_HEADER = "customer_email,Budget\n";
+            final String EXPENSE_HEADER = "customer_email,subject_or_name,type,status,expense\n";
 
-        String emailCopy = CustomerDuplicationUtil.getEmailCopy(customer.getEmail());
+            String emailCopy = CustomerCsvExportUtil.getEmailCopy(customer.getEmail());
 
-        // Write customer data
-        writer.write(CUSTOMER_HEADER);
-        writer.write(CustomerDuplicationUtil.getCustomerCsv(customer));
-        writer.write(CSV_SEPARATOR);
+            // Write customer data (original format)
+            writer.write(CUSTOMER_HEADER);
+            writer.write(CustomerCsvExportUtil.getCustomerCsvOriginal(customer));
+            writer.write(CSV_SEPARATOR);
 
-        // Write budget data
-        writer.write(BUDGET_HEADER);
-        for (CustomerBudgetDto budget : customerBudgets) {
-            writer.write(CustomerDuplicationUtil.getCustomerBudgetCsv(emailCopy, budget));
-            writer.write(NEW_LINE);
-        }
-        writer.write(CSV_SEPARATOR);
+            // Write budget data (original format)
+            writer.write(BUDGET_HEADER);
+            for (CustomerBudgetDto budget : customerBudgets) {
+                writer.write(CustomerCsvExportUtil.getCustomerBudgetCsv(emailCopy, budget));
+                writer.write(NEW_LINE);
+            }
+            writer.write(CSV_SEPARATOR);
 
-        // Write expense data
-        writer.write(EXPENSE_HEADER);
-        for (LeadExpense leadExpense : leadExpenses) {
-            writer.write(CustomerDuplicationUtil.getLeadExpenseCsv(leadExpense));
-            writer.write(NEW_LINE);
-        }
-        for (TicketExpense ticketExpense : ticketExpenses) {
-            writer.write(CustomerDuplicationUtil.getTicketExpenseCsv(ticketExpense));
-            writer.write(NEW_LINE);
-        }
-        writer.write(CSV_SEPARATOR);
+            // Write expense data (original format)
+            writer.write(EXPENSE_HEADER);
+            for (LeadExpense leadExpense : leadExpenses) {
+                writer.write(CustomerCsvExportUtil.getLeadExpenseCsvOriginal(emailCopy, leadExpense));
+                writer.write(NEW_LINE);
+            }
+            for (TicketExpense ticketExpense : ticketExpenses) {
+                writer.write(CustomerCsvExportUtil.getTicketExpenseCsvOriginal(emailCopy, ticketExpense));
+                writer.write(NEW_LINE);
+            }
+            // No leads or tickets in original format
+        } else {
+            // Enhanced format headers (default)
+            final String CUSTOMER_HEADER = "CUSTOMER:name,email,position,phone,address,city,state,country,description,twitter,facebook,youtube,user_username\n";
+            final String BUDGET_HEADER = "BUDGET:customer_email,Budget\n";
+            final String EXPENSE_HEADER = "EXPENSE:type,lead_name_or_subject,description,amount\n";
+            final String LEAD_HEADER = "LEAD:name,status,phone,manager_name,employee_name,customer_email\n";
+            final String TICKET_HEADER = "TICKET:subject,description,status,priority,manager_name,employee_name,customer_email\n";
 
-        // Write lead data
-        writer.write(LEAD_HEADER);
-        for (Lead lead : leads) {
-            writer.write(CustomerDuplicationUtil.getLeadCsv(lead, emailCopy));
-            writer.write(NEW_LINE);
-        }
-        writer.write(CSV_SEPARATOR);
+            String emailCopy = CustomerCsvExportUtil.getEmailCopy(customer.getEmail());
 
-        // Write ticket data
-        writer.write(TICKET_HEADER);
-        for (Ticket ticket : tickets) {
-            writer.write(CustomerDuplicationUtil.getTicketCsv(ticket, emailCopy));
-            writer.write(NEW_LINE);
+            // Write customer data (enhanced format)
+            writer.write(CUSTOMER_HEADER);
+            writer.write(CustomerCsvExportUtil.getCustomerCsv(customer));
+            writer.write(CSV_SEPARATOR);
+
+            // Write budget data (enhanced format)
+            writer.write(BUDGET_HEADER);
+            for (CustomerBudgetDto budget : customerBudgets) {
+                writer.write(CustomerCsvExportUtil.getCustomerBudgetCsv(emailCopy, budget));
+                writer.write(NEW_LINE);
+            }
+            writer.write(CSV_SEPARATOR);
+
+            // Write expense data (enhanced format)
+            writer.write(EXPENSE_HEADER);
+            for (LeadExpense leadExpense : leadExpenses) {
+                writer.write(CustomerCsvExportUtil.getLeadExpenseCsv(leadExpense));
+                writer.write(NEW_LINE);
+            }
+            for (TicketExpense ticketExpense : ticketExpenses) {
+                writer.write(CustomerCsvExportUtil.getTicketExpenseCsv(ticketExpense));
+                writer.write(NEW_LINE);
+            }
+            writer.write(CSV_SEPARATOR);
+
+            // Write lead data (enhanced format)
+            writer.write(LEAD_HEADER);
+            for (Lead lead : leads) {
+                writer.write(CustomerCsvExportUtil.getLeadCsv(lead, emailCopy));
+                writer.write(NEW_LINE);
+            }
+            writer.write(CSV_SEPARATOR);
+
+            // Write ticket data (enhanced format)
+            writer.write(TICKET_HEADER);
+            for (Ticket ticket : tickets) {
+                writer.write(CustomerCsvExportUtil.getTicketCsv(ticket, emailCopy));
+                writer.write(NEW_LINE);
+            }
         }
     }
 }
