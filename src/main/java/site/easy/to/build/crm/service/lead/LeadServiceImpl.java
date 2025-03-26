@@ -22,6 +22,11 @@ public class LeadServiceImpl implements LeadService {
         return leadRepository.findAll();
     }
 
+    public Lead getLeadByName(String name, Integer customerId) {
+        return leadRepository.findLeadByName(name, customerId);
+
+    }
+
     @Override
     public Lead findByLeadId(int id) {
         return leadRepository.findByLeadId(id);
