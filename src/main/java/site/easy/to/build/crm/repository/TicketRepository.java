@@ -14,6 +14,9 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     public List<Ticket> findAll();
 
+    @Query("SELECT t FROM Ticket t WHERE t.subject = :subject AND t.customer.customerId = :customerId")
+    Ticket findTicketBySubject(@Param("subject") String subject, @Param("customerId") Integer customerId);
+
     @Query("SELECT t FROM Ticket t WHERE t.ticketId = :ticketId")
     Ticket findByTicketId(@Param("ticketId") int ticketId);
 

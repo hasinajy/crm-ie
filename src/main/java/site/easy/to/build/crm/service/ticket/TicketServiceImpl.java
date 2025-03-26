@@ -22,6 +22,10 @@ public class TicketServiceImpl implements TicketService {
         return ticketRepository.findAll();
     }
 
+    public Ticket findTicketBySubject(String name, Integer customerId) {
+        return ticketRepository.findTicketBySubject(name, customerId);
+    }
+
     @Override
     public Ticket findByTicketId(int id) {
         return ticketRepository.findByTicketId(id);

@@ -125,7 +125,7 @@ public class CustomerCsvExportUtil {
     public static String getCustomerCsvOriginal(Customer customer) {
         return String.format("%s,%s",
                 escapeCsv(getEmailCopy(customer.getEmail())),
-                escapeCsv(customer.getName()));
+                escapeCsv(getNameCopy(customer.getName())));
     }
 
     /**
