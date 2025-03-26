@@ -2,6 +2,11 @@ package site.easy.to.build.crm.controller;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+
+import lombok.RequiredArgsConstructor;
+import site.easy.to.build.crm.entity.User;
+import site.easy.to.build.crm.service.user.UserServiceImpl;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +20,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class JwtAuthenticationController {
+    private final UserServiceImpl userService;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -25,7 +32,9 @@ public class JwtAuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
-        if (authenticationRequest.getUsername().equals("hasina")) {
+        List<User> authUsers = userService.findByUsername(authenticationRequest.getUsername());
+
+        if (!authUsers.isEmpty()) {
             String token = generateToken(authenticationRequest.getUsername(), List.of("ROLE_MANAGER"));
             return ResponseEntity.ok(new JwtResponse(token));
         } else {
